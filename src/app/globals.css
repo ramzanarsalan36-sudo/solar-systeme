@@ -2,26 +2,36 @@
 
 @layer base {
   :root {
-    --navy-950: #0a1424;
-    --navy-900: #10233F;
-    --navy-800: #1b355d;
-    --navy-700: #25497f;
-    --solar-amber: #F4B740;
-    --solar-amber-dark: #D99B26;
-    --solar-amber-light: #FFF8E7;
-    --solar-emerald: #15803D;
-    --off-white: #F8FAFC;
-    --card-surface: #FFFFFF;
-    --text-primary: #172033;
-    --text-secondary: #64748B;
-    --border-subtle: #E2E8F0;
+    /* Twenty CRM Surface Tokens */
+    --twenty-canvas: #FBFBFC;
+    --twenty-surface: #FFFFFF;
+    --twenty-surface-hover: #F8F9FA;
+    --twenty-surface-secondary: #F4F5F7;
+    --twenty-surface-tertiary: #ECEEF1;
+    --twenty-sidebar: #0B1120;
+    --twenty-sidebar-border: rgba(255, 255, 255, 0.08);
+
+    /* Twenty CRM Typography & Neutral Colors */
+    --twenty-text-primary: #0F172A;
+    --twenty-text-secondary: #475569;
+    --twenty-text-tertiary: #94A3B8;
+    --twenty-border-subtle: #E2E8F0;
+    --twenty-border-medium: #CBD5E1;
+
+    /* Systomech Solar Accent Tokens (Twenty-inspired) */
+    --solar-amber: #F59E0B;
+    --solar-amber-dark: #D97706;
+    --solar-orange: #EA580C;
+    --solar-emerald: #10B981;
+    --solar-blue: #2563EB;
   }
 
   body {
-    background-color: var(--off-white);
-    color: var(--text-primary);
+    background-color: var(--twenty-canvas);
+    color: var(--twenty-text-primary);
     font-family: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
   }
 }
 
