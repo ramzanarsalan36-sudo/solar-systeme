@@ -191,7 +191,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
               return (
                 <div
                   key={p.id}
-                  className="bg-white rounded-2xl border border-slate-200/90 shadow-xs hover:shadow-md transition-all overflow-hidden flex flex-col group"
+                  className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col group"
                 >
                   {/* Equipment HD Photo */}
                   <div className="relative h-44 bg-slate-100 overflow-hidden">

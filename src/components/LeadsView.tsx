@@ -49,25 +49,25 @@ interface KanbanStage {
 const KANBAN_STAGES: KanbanStage[] = [
   {
     id: 'new',
-    label: 'New Inquiries',
+    label: 'New Inquiry',
     color: 'text-blue-700',
     bgLight: 'bg-blue-50/70 border-blue-200',
     badgeBg: 'bg-blue-100 text-blue-800',
     matchStatuses: ['new'],
-    nextStatus: 'contacted',
+    nextStatus: 'survey_scheduled',
   },
   {
-    id: 'contacted',
-    label: 'Contacted / Site Survey',
+    id: 'survey_scheduled',
+    label: 'Site Survey Scheduled',
     color: 'text-amber-700',
     bgLight: 'bg-amber-50/70 border-amber-200',
     badgeBg: 'bg-amber-100 text-amber-800',
-    matchStatuses: ['contacted', 'survey_scheduled'],
+    matchStatuses: ['survey_scheduled', 'contacted'],
     nextStatus: 'quote_generated',
   },
   {
     id: 'quote_generated',
-    label: 'Quote Generated',
+    label: 'Quote Sent',
     color: 'text-indigo-700',
     bgLight: 'bg-indigo-50/70 border-indigo-200',
     badgeBg: 'bg-indigo-100 text-indigo-800',
@@ -244,7 +244,18 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
             return (
               <div
                 key={stage.id}
-                className="flex flex-col bg-slate-50/70 rounded-2xl border border-slate-200 p-3 min-w-[260px] h-[calc(100vh-280px)] min-h-[520px]"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.dataTransfer.dropEffect = 'move';
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const droppedLeadId = e.dataTransfer.getData('text/plain');
+                  if (droppedLeadId) {
+                    handleStageMove(droppedLeadId, stage.matchStatuses[0]);
+                  }
+                }}
+                className="flex flex-col bg-slate-50/70 rounded-2xl border border-slate-200 p-3 min-w-[270px] h-[calc(100vh-280px)] min-h-[520px] transition-colors"
               >
                 {/* Column Header */}
                 <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
@@ -275,8 +286,12 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                     return (
                       <div
                         key={lead.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('text/plain', lead.id);
+                        }}
                         onClick={() => setSelectedDrawerLead(lead)}
-                        className="bg-white rounded-xl border border-slate-200/90 hover:border-amber-400/80 hover:shadow-md transition-all p-3.5 cursor-pointer space-y-2.5 group relative"
+                        className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 p-4 cursor-pointer space-y-3 group relative"
                       >
                         {/* Top: Name & Quick Stage Move */}
                         <div className="flex items-start justify-between gap-1">
@@ -295,8 +310,8 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                               e.stopPropagation();
                               onOpenQuoteForLead(lead);
                             }}
-                            className="p-1 rounded-md text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors"
-                            title="1-Click Convert to Quotation"
+                            className="p-1.5 rounded-lg text-amber-700 bg-amber-50 hover:bg-gradient-to-r hover:from-amber-500 hover:to-orange-500 hover:text-white transition-all shadow-xs"
+                            title="Generate 2-Min Quotation"
                           >
                             <Calculator className="w-3.5 h-3.5" />
                           </button>
@@ -315,33 +330,33 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                         </div>
 
                         {/* Bill & Estimated kW */}
-                        <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-[11px]">
+                        <div className="p-2.5 bg-slate-50/80 rounded-xl border border-slate-100 flex items-center justify-between text-[11px]">
                           <div>
-                            <span className="text-[9px] text-slate-400 block">Monthly Bill</span>
+                            <span className="text-[9px] text-slate-400 block font-medium">Monthly Bill</span>
                             <span className="font-bold text-slate-900">
                               ₹{(lead.monthlyBill || 4500).toLocaleString('en-IN')}
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="text-[9px] text-slate-400 block">Est. Solar</span>
-                            <span className="font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded text-[10px]">
+                            <span className="text-[9px] text-slate-400 block font-medium">System Size</span>
+                            <span className="font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md text-[10px]">
                               ~{lead.estimatedKw || 3} kW
                             </span>
                           </div>
                         </div>
 
-                        {/* Source Tag & Next Follow-up */}
+                        {/* Source Tag & Next Follow-up Badge */}
                         <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-[10px]">
-                          <span className="font-semibold uppercase text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded text-[9px]">
+                          <span className="font-semibold uppercase text-slate-500 bg-slate-100 px-2 py-0.5 rounded text-[9px]">
                             {lead.source}
                           </span>
 
                           {nextFup ? (
                             <span
-                              className={`inline-flex items-center gap-1 font-semibold text-[9px] px-1.5 py-0.5 rounded ${
+                              className={`inline-flex items-center gap-1 font-semibold text-[9px] px-2 py-0.5 rounded-full ${
                                 isDueToday
                                   ? 'bg-rose-100 text-rose-800 font-bold animate-pulse'
-                                  : 'bg-slate-100 text-slate-600'
+                                  : 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-bold'
                               }`}
                             >
                               <Clock className="w-2.5 h-2.5" />
@@ -357,13 +372,13 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
 
                         {/* Stage Progression Buttons on Hover */}
                         {stage.nextStatus && (
-                          <div className="pt-1.5 flex justify-end">
+                          <div className="pt-1 flex justify-end">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleStageMove(lead.id, stage.nextStatus!);
                               }}
-                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-amber-800 hover:bg-amber-50 px-2 py-0.5 rounded transition-colors"
+                              className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 hover:text-amber-800 hover:bg-amber-50 px-2 py-1 rounded-lg transition-colors"
                             >
                               <span>Next Stage</span>
                               <ChevronRight className="w-3 h-3" />
@@ -376,7 +391,7 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
 
                   {stageLeads.length === 0 && (
                     <div className="py-8 text-center text-slate-400 text-xs italic border-2 border-dashed border-slate-200/80 rounded-xl">
-                      No leads in this stage
+                      Drag lead here or intake new inquiry
                     </div>
                   )}
                 </div>
@@ -483,10 +498,10 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
             </div>
 
             {/* 1-Click Convert to Quotation CTA Banner */}
-            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-amber-200 flex items-center justify-between gap-3 shrink-0">
+            <div className="p-4 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border-b border-amber-200/80 flex items-center justify-between gap-3 shrink-0">
               <div>
-                <span className="text-xs font-bold text-amber-950 block">Ready to Size Rooftop Solar?</span>
-                <span className="text-[11px] text-amber-800">
+                <span className="text-xs font-bold text-slate-900 block">Ready to Size Rooftop Solar?</span>
+                <span className="text-[11px] text-slate-600">
                   Est. {selectedDrawerLead.estimatedKw || 3} kW based on ₹{selectedDrawerLead.monthlyBill} bill.
                 </span>
               </div>
@@ -496,10 +511,10 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                   setSelectedDrawerLead(null);
                   onOpenQuoteForLead(target);
                 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0A1128] hover:bg-[#15234A] text-amber-400 transition-all shadow-sm shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all shrink-0 cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Convert to Quotation</span>
+                <Sparkles className="w-4 h-4" />
+                <span>Generate 2-Min Quotation</span>
               </button>
             </div>
 
@@ -515,12 +530,12 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                   onChange={(e) => handleStageMove(selectedDrawerLead.id, e.target.value as LeadStatus)}
                   className="w-full px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
                 >
-                  <option value="new">New Inquiries</option>
-                  <option value="contacted">Contacted / Site Survey</option>
-                  <option value="quote_generated">Quote Generated</option>
-                  <option value="negotiation">Under Negotiation</option>
-                  <option value="won">Won / In Installation</option>
-                  <option value="lost">Closed Lost</option>
+                  <option value="new">1. New Inquiry</option>
+                  <option value="survey_scheduled">2. Site Survey Scheduled</option>
+                  <option value="quote_generated">3. Quote Sent</option>
+                  <option value="negotiation">4. Under Negotiation</option>
+                  <option value="won">5. Won / In Installation</option>
+                  <option value="lost">6. Closed Lost</option>
                 </select>
               </div>
 
@@ -705,6 +720,28 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
                   )}
                 </div>
               </div>
+            </div>
+
+            {/* Sticky Drawer Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+              <a
+                href={`tel:${selectedDrawerLead.phone}`}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Call Client</span>
+              </a>
+              <button
+                onClick={() => {
+                  const target = selectedDrawerLead;
+                  setSelectedDrawerLead(null);
+                  onOpenQuoteForLead(target);
+                }}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer"
+              >
+                <Calculator className="w-4 h-4" />
+                <span>Generate 2-Min Quotation</span>
+              </button>
             </div>
           </div>
         </div>

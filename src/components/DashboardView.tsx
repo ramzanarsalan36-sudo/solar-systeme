@@ -123,16 +123,24 @@ export function DashboardView({
         </div>
       </div>
 
-      {/* Main Hero Cockpit Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-[#10233F] via-[#162f55] to-[#0c1a2f] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-[#1b355d]">
-        {/* Subtle Solar Glow Effect */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#F4B740]/15 to-transparent rounded-full blur-3xl pointer-events-none" />
+      {/* Main Hero Cockpit Banner with Real Rooftop Array Photo */}
+      <div className="relative overflow-hidden bg-[#0B1120] rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800">
+        {/* Real Context Background Photo */}
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-20 pointer-events-none"
+          style={{
+            backgroundImage:
+              'url("https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=80")',
+          }}
+        />
+        {/* Radiant Solar Glow Accent */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-500/20 via-orange-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold bg-[#F4B740] text-[#10233F] shadow-xs">
-                <Sun className="w-3.5 h-3.5 fill-[#10233F]" />
+              <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold bg-amber-400 text-slate-950 shadow-xs">
+                <Sun className="w-3.5 h-3.5 fill-slate-950" />
                 SYSTOMECH ENGINEERS &bull; SOLAR EPC
               </span>
               <span className="text-xs text-slate-300 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
@@ -156,29 +164,29 @@ export function DashboardView({
             </p>
           </div>
 
-          {/* Action CTAs */}
+          {/* Action CTAs with Radiant Solar Gradient */}
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             {role !== 'store_field' ? (
               <>
                 <button
                   onClick={onOpenQuoteModal}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-[#F4B740] hover:bg-[#D99B26] text-[#10233F] transition-all shadow-lg shadow-amber-500/25 hover:scale-102"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-102"
                 >
                   <Calculator className="w-4 h-4" />
                   <span>Bill to Quote (2 Mins)</span>
                 </button>
                 <button
                   onClick={onOpenLeadModal}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all backdrop-blur-xs"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-all backdrop-blur-xs cursor-pointer"
                 >
-                  <PlusCircle className="w-4 h-4 text-[#F4B740]" />
+                  <PlusCircle className="w-4 h-4 text-amber-400" />
                   <span>+ New Lead</span>
                 </button>
               </>
             ) : (
               <button
                 onClick={onOpenStockModal}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-[#F4B740] hover:bg-[#D99B26] text-[#10233F] transition-all shadow-lg shadow-amber-500/25 hover:scale-102"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer hover:scale-102"
               >
                 <Warehouse className="w-4 h-4" />
                 <span>Record Stock Movement</span>
@@ -201,7 +209,7 @@ export function DashboardView({
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block uppercase font-medium">Govt Subsidy Disbursal</span>
-            <span className="text-base sm:text-lg font-bold text-[#F4B740]">PM Surya Ghar</span>
+            <span className="text-base sm:text-lg font-bold text-amber-400">PM Surya Ghar</span>
             <span className="block text-[10px] text-slate-300">Up to ₹78,000 / Consumer</span>
           </div>
           <div>
@@ -212,12 +220,12 @@ export function DashboardView({
         </div>
       </div>
 
-      {/* 4 Interactive KPI Cards with Visual Elevation */}
+      {/* 4 Interactive KPI Cards with Visual Elevation (Pure White Floating Cards) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Leads */}
         <div
           onClick={() => setActiveTab(role === 'store_field' ? 'tasks' : 'leads')}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group"
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 cursor-pointer group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -243,7 +251,7 @@ export function DashboardView({
         {/* Card 2: Quotations / Catalog */}
         <div
           onClick={() => setActiveTab(role === 'store_field' ? 'inventory' : 'quotations')}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-amber-300 transition-all cursor-pointer group"
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 cursor-pointer group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -269,7 +277,7 @@ export function DashboardView({
         {/* Card 3: Orders & Collections */}
         <div
           onClick={() => setActiveTab('orders')}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer group"
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 cursor-pointer group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -281,7 +289,7 @@ export function DashboardView({
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold text-slate-900">{orders.length}</span>
-            <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
               {formatIndianCurrency(totalPaidRevenue)} Paid
             </span>
           </div>
@@ -293,7 +301,7 @@ export function DashboardView({
         {/* Card 4: Action Alerts */}
         <div
           onClick={() => setActiveTab(role === 'sales' ? 'leads' : 'inventory')}
-          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:border-rose-300 transition-all cursor-pointer group"
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 cursor-pointer group"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -314,7 +322,7 @@ export function DashboardView({
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
               (role === 'sales' ? dueTodayFollowups.length : lowStockProducts.length) > 0
                 ? 'bg-rose-100 text-rose-800'
-                : 'bg-emerald-100 text-emerald-800'
+                : 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-bold'
             }`}>
               {(role === 'sales' ? dueTodayFollowups.length : lowStockProducts.length) > 0 ? 'Urgent Action' : 'All Clear'}
             </span>

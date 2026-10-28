@@ -56,9 +56,9 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
         {role !== 'store_field' && (
           <button
             onClick={onOpenQuoteModal}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#10233F] hover:bg-[#1b355d] text-white transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer"
           >
-            <PlusCircle className="w-4 h-4 text-[#F4B740]" />
+            <PlusCircle className="w-4 h-4" />
             <span>Create Sizing Quotation</span>
           </button>
         )}
@@ -67,13 +67,13 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
       {/* Search & Filter */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by quote ref, customer name, phone, or city..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-white"
+            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-white shadow-2xs"
           />
         </div>
 
@@ -82,9 +82,9 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize shrink-0 transition-colors ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shrink-0 transition-all ${
                 statusFilter === st
-                  ? 'bg-[#10233F] text-white shadow-xs font-semibold'
+                  ? 'bg-[#0B1120] text-amber-400 shadow-xs font-bold'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -95,7 +95,7 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
       </div>
 
       {/* Quotations Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>

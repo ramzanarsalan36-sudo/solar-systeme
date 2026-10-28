@@ -67,10 +67,12 @@ export default function SolarCrmApp() {
   const handleUserChange = (newUser: User) => {
     crmStorage.setCurrentUser(newUser);
     setCurrentUser(newUser);
-    // If current tab is restricted for new role, switch to dashboard
-    if (newUser.role === 'store_field' && ['leads', 'calculator', 'quotations', 'audit'].includes(activeTab)) {
-      setActiveTab('dashboard');
-    } else if (newUser.role === 'sales' && ['inventory', 'tasks', 'audit'].includes(activeTab)) {
+    // Switch directly to role's primary operational workspace
+    if (newUser.role === 'store_field') {
+      setActiveTab('tasks');
+    } else if (newUser.role === 'sales') {
+      setActiveTab('leads');
+    } else {
       setActiveTab('dashboard');
     }
   };
