@@ -89,12 +89,12 @@ export default function SolarCrmApp() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#10233F] flex flex-col items-center justify-center text-white">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F4B740] to-[#D99B26] flex items-center justify-center shadow-lg shadow-amber-500/20 mb-4">
-          <Sun className="w-7 h-7 text-[#10233F] stroke-[2.5]" />
+      <div className="min-h-screen bg-[#0F172A] flex flex-col items-center justify-center text-white">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 flex items-center justify-center shadow-xl shadow-amber-500/25 mb-4 animate-pulse">
+          <Sun className="w-7 h-7 text-slate-950 stroke-[2.5]" />
         </div>
         <h2 className="text-lg font-bold tracking-tight">SYSTOMECH ENGINEERS</h2>
-        <p className="text-xs text-slate-400 mt-1">Initializing Solar CRM Workspace...</p>
+        <p className="text-xs text-slate-400 mt-1">Initializing Solar Operations Platform...</p>
       </div>
     );
   }

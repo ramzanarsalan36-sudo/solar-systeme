@@ -1,59 +1,82 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   SYSTOMECH SOLAR CRM — INFISPARKS PRODUCTION DESIGN SYSTEM
+   Font: Poppins (Clean, Elegant, Easy to read, Light/Medium weights)
+   Palette: Deep Slate Navy (#0B132B) + Warm Amber (#F59E0B / #D97706) + Neutral Cards
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
-    /* Twenty CRM Surface Tokens */
-    --twenty-canvas: #FBFBFC;
-    --twenty-surface: #FFFFFF;
-    --twenty-surface-hover: #F8F9FA;
-    --twenty-surface-secondary: #F4F5F7;
-    --twenty-surface-tertiary: #ECEEF1;
-    --twenty-sidebar: #0B1120;
-    --twenty-sidebar-border: rgba(255, 255, 255, 0.08);
-
-    /* Twenty CRM Typography & Neutral Colors */
-    --twenty-text-primary: #0F172A;
-    --twenty-text-secondary: #475569;
-    --twenty-text-tertiary: #94A3B8;
-    --twenty-border-subtle: #E2E8F0;
-    --twenty-border-medium: #CBD5E1;
-
-    /* Systomech Solar Accent Tokens (Twenty-inspired) */
+    --brand-navy: #0B132B;
+    --brand-navy-card: #151F38;
+    --brand-blue: #2563EB;
     --solar-amber: #F59E0B;
-    --solar-amber-dark: #D97706;
-    --solar-orange: #EA580C;
-    --solar-emerald: #10B981;
-    --solar-blue: #2563EB;
+    --solar-gold: #D97706;
+
+    --surface-bg: #F3F5F9;
+    --surface-card: #FFFFFF;
+    --surface-border: #E8ECF2;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
   }
 
   body {
-    background-color: var(--twenty-canvas);
-    color: var(--twenty-text-primary);
-    font-family: var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--surface-bg);
+    color: var(--text-primary);
+    font-family: var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
   }
 }
 
-/* Print styling for professional A4 quotations */
+/* Print styling for professional single-page A4 quotations */
 @media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
+  @page {
+    size: A4 portrait;
+    margin: 5mm 7mm;
   }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 8.8pt !important;
+    line-height: 1.25 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .no-print {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
   }
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
+
+  .a4-document-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
-/* Custom scrollbars */
+/* Custom modern sleek scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -63,7 +86,7 @@
 }
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;

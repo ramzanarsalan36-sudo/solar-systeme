@@ -765,7 +765,7 @@ export function LeadsView({ role, onOpenLeadModal, onOpenQuoteForLead }: LeadsVi
 
                     <button
                       type="submit"
-                      className="w-full py-2 bg-[#0B1120] hover:bg-slate-800 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                      className="w-full py-2 bg-[#0F172A] hover:bg-slate-800 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5 border border-slate-700 cursor-pointer"
                     >
                       <Send className="w-3.5 h-3.5 text-amber-400" />
                       <span>Record Activity &amp; Set Reminder</span>

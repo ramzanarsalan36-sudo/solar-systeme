@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Task, TaskStatus } from '@/types/crm';
 import {
@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   Sun,
   Zap,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface TaskModalProps {
@@ -68,6 +69,16 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
     }
   }, [task]);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !task) return null;
 
   const handleToggleChecklist = (checkId: string) => {
@@ -114,27 +125,48 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
     task.checklist.length > 0 ? Math.round((completedCount / task.checklist.length) * 100) : 0;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden my-6 flex flex-col">
-        {/* Modal Header */}
-        <div className="px-6 py-4 bg-[#0A1128] text-white flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-400 text-[#0A1128] flex items-center justify-center font-bold">
-              <Wrench className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold tracking-tight">{task.taskNumber}</h3>
-                <span className="text-[10px] px-2 py-0.2 rounded font-bold uppercase tracking-wider bg-amber-400 text-[#0A1128]">
-                  Field Operations
-                </span>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print"
+    >
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-xl overflow-hidden my-6 flex flex-col">
+        {/* Modal Header with Prominent Back Option */}
+        <div className="px-5 sm:px-6 py-3.5 bg-[#0F172A] text-white flex items-center justify-between shrink-0 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95"
+              title="Return (or press Esc)"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-amber-400" />
+              <span>Back</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-700 hidden sm:block" />
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold shrink-0">
+                <Wrench className="w-4 h-4" />
               </div>
-              <p className="text-xs text-slate-300">Assigned Field Engineer: {task.assignedToName}</p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold tracking-tight">{task.taskNumber}</h3>
+                  <span className="text-[10px] px-2 py-0.2 rounded font-bold uppercase tracking-wider bg-amber-400 text-slate-950">
+                    Field Ops
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 hidden sm:block">Engineer: {task.assignedToName}</p>
+              </div>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Close (Esc)"
           >
             <X className="w-5 h-5" />
           </button>

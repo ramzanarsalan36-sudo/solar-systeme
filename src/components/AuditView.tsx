@@ -71,7 +71,7 @@ export function AuditView({ role }: AuditViewProps) {
               onClick={() => setEntityFilter(et)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize shrink-0 transition-colors ${
                 entityFilter === et
-                  ? 'bg-[#10233F] text-white shadow-xs font-semibold'
+                  ? 'bg-[#0F172A] text-amber-400 shadow-xs font-bold border border-slate-700'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >

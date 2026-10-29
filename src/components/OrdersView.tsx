@@ -138,7 +138,7 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
                   {role !== 'store_field' && (
                     <button
                       onClick={() => onOpenPaymentModal(order)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#10233F] text-[#F4B740] hover:bg-[#1b355d] transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#0F172A] text-amber-400 hover:bg-slate-800 transition-colors shadow-xs border border-slate-700 cursor-pointer"
                     >
                       <CreditCard className="w-3.5 h-3.5" />
                       <span>Record Payment</span>

@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Product } from '@/types/crm';
 import { formatIndianCurrency } from '@/lib/solar-calc';
-import { X, Tag, ShieldAlert, CheckCircle } from 'lucide-react';
+import { X, Tag, ShieldAlert, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface PriceUpdateModalProps {
   isOpen: boolean;
@@ -16,6 +16,16 @@ interface PriceUpdateModalProps {
 export function PriceUpdateModal({ isOpen, onClose, product, onPriceUpdated }: PriceUpdateModalProps) {
   const [newPrice, setNewPrice] = useState<number>(product?.price || 0);
   const [reason, setReason] = useState<string>('');
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !product) return null;
 
@@ -37,19 +47,40 @@ export function PriceUpdateModal({ isOpen, onClose, product, onPriceUpdated }: P
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden my-6">
-        <div className="px-5 py-3.5 bg-[#10233F] text-white flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-[#F4B740] text-[#10233F] flex items-center justify-center font-bold">
-              <Tag className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold tracking-tight">Update Approved Catalog Price</h3>
-              <p className="text-[10px] text-slate-300">Admin Price Master Authority</p>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 w-full max-w-md overflow-hidden my-6">
+        <div className="px-5 py-3.5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95"
+              title="Return (or press Esc)"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-amber-400" />
+              <span>Back</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                <Tag className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold tracking-tight">Update Approved Catalog Price</h3>
+                <p className="text-[10px] text-slate-400">Admin Price Master Authority</p>
+              </div>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg text-slate-300 hover:text-white hover:bg-[#1b355d]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Close (Esc)"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -113,7 +144,7 @@ export function PriceUpdateModal({ isOpen, onClose, product, onPriceUpdated }: P
             </button>
             <button
               type="submit"
-              className="px-4 py-1.5 font-bold text-[#10233F] bg-[#F4B740] hover:bg-[#D99B26] rounded-lg shadow-xs"
+              className="px-4 py-1.5 font-bold text-[#0F172A] bg-[#F59E0B] hover:bg-[#D97706] rounded-lg shadow-xs"
             >
               Approve &amp; Log Price Change
             </button>

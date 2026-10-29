@@ -56,9 +56,9 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
 
         <button
           onClick={() => onOpenStockModal()}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#10233F] hover:bg-[#1b355d] text-white transition-colors shadow-sm"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-[#0F172A] hover:bg-slate-800 text-white transition-colors shadow-sm border border-slate-700 cursor-pointer"
         >
-          <PlusCircle className="w-4 h-4 text-[#F4B740]" />
+          <PlusCircle className="w-4 h-4 text-amber-400" />
           <span>Record Stock In / Out</span>
         </button>
       </div>
@@ -68,9 +68,9 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('balance')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'balance'
-                ? 'bg-[#10233F] text-white shadow-xs'
+                ? 'bg-[#0F172A] text-amber-400 shadow-xs border border-slate-700'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
@@ -78,9 +78,9 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
           </button>
           <button
             onClick={() => setActiveTab('movements')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'movements'
-                ? 'bg-[#10233F] text-white shadow-xs'
+                ? 'bg-[#0F172A] text-amber-400 shadow-xs border border-slate-700'
                 : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >

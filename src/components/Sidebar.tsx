@@ -5,17 +5,15 @@ import { UserRole } from '@/types/crm';
 import {
   LayoutDashboard,
   Users,
-  Calculator,
-  FileSpreadsheet,
-  PackageCheck,
-  Warehouse,
-  Wrench,
-  ShieldAlert,
+  UserCheck,
+  FileText,
+  ShoppingBag,
   Boxes,
+  CheckSquare,
+  Wrench,
+  BarChart3,
+  Settings,
   Sun,
-  Zap,
-  CheckCircle2,
-  Sparkles,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,7 +27,6 @@ interface SidebarProps {
 interface NavItem {
   id: string;
   label: string;
-  hindiLabel?: string;
   icon: React.ComponentType<{ className?: string }>;
   roles: UserRole[];
 }
@@ -37,65 +34,62 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   {
     id: 'dashboard',
-    label: 'Dashboard Overview',
-    hindiLabel: 'डैशबोर्ड',
+    label: 'Dashboard',
     icon: LayoutDashboard,
     roles: ['admin', 'sales', 'store_field'],
   },
   {
     id: 'leads',
-    label: 'Leads Pipeline',
-    hindiLabel: 'ग्राहक लीड्स & कानबन',
+    label: 'Leads',
     icon: Users,
     roles: ['admin', 'sales'],
   },
   {
-    id: 'calculator',
-    label: 'Bill to Solar Quote',
-    hindiLabel: 'बिजली बिल से कोटेशन',
-    icon: Calculator,
+    id: 'customers',
+    label: 'Customers',
+    icon: UserCheck,
     roles: ['admin', 'sales'],
   },
   {
     id: 'quotations',
-    label: 'Quotations Hub',
-    hindiLabel: 'कोटेशन लिस्ट & PDF',
-    icon: FileSpreadsheet,
+    label: 'Quotations',
+    icon: FileText,
     roles: ['admin', 'sales'],
   },
   {
     id: 'orders',
-    label: 'Orders & Payments',
-    hindiLabel: 'ऑर्डर & पेमेंट लिस्ट',
-    icon: PackageCheck,
+    label: 'Orders',
+    icon: ShoppingBag,
     roles: ['admin', 'sales'],
   },
   {
-    id: 'inventory',
-    label: 'Stock & Inventory',
-    hindiLabel: 'वेयरहाउस स्टॉक',
-    icon: Warehouse,
-    roles: ['admin', 'store_field'],
+    id: 'products',
+    label: 'Products & Stock',
+    icon: Boxes,
+    roles: ['admin', 'sales', 'store_field'],
   },
   {
     id: 'tasks',
-    label: 'Field Tasks & Ops',
-    hindiLabel: 'फील्ड काम & इन्सपेक्शन',
+    label: 'Tasks',
+    icon: CheckSquare,
+    roles: ['admin', 'store_field'],
+  },
+  {
+    id: 'field_operations',
+    label: 'Field Operations',
     icon: Wrench,
     roles: ['admin', 'store_field'],
   },
   {
-    id: 'products',
-    label: 'Product Master & Rates',
-    hindiLabel: 'प्रोडक्ट & रेट मास्टर',
-    icon: Boxes,
-    roles: ['admin', 'sales'],
+    id: 'reports',
+    label: 'Reports',
+    icon: BarChart3,
+    roles: ['admin'],
   },
   {
-    id: 'audit',
-    label: 'Security & Audit Logs',
-    hindiLabel: 'सिस्टम ऑडिट लॉग',
-    icon: ShieldAlert,
+    id: 'settings',
+    label: 'Settings',
+    icon: Settings,
     roles: ['admin'],
   },
 ];
@@ -109,93 +103,102 @@ export function Sidebar({ activeTab, setActiveTab, role, mobileOpen, setMobileOp
       {mobileOpen && (
         <div
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-30 md:hidden no-print"
+          className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-30 md:hidden no-print"
         />
       )}
 
-      {/* Sidebar Panel with Deep Obsidian Slate (#0B1120) */}
+      {/* Sidebar Panel with Deep Midnight Navy (#0B132B) */}
       <aside
-        className={`fixed top-16 bottom-0 left-0 z-30 w-64 bg-[#0B1120] text-slate-300 border-r border-slate-800/90 shadow-2xl transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:sticky md:top-16 md:h-[calc(100vh-4rem)] md:shrink-0 md:z-10 no-print flex flex-col justify-between ${
+        className={`fixed top-0 bottom-0 left-0 z-30 w-64 bg-[#0B132B] text-slate-300 border-r border-[#192440] shadow-2xl transition-transform duration-200 ease-in-out md:translate-x-0 md:static md:sticky md:top-0 md:h-screen md:shrink-0 md:z-20 no-print flex flex-col justify-between ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex-1 overflow-y-auto py-4">
-          <div className="px-4 pb-2.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase flex items-center justify-between">
-            <span>Operations Workspace</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+        <div className="flex-1 overflow-y-auto py-5 px-4 space-y-6">
+          {/* Top Brand Logo - Exact from Image 2 */}
+          <div
+            onClick={() => {
+              setActiveTab('dashboard');
+              setMobileOpen(false);
+            }}
+            className="flex items-center gap-3 cursor-pointer group px-2"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 flex items-center justify-center shadow-md shadow-amber-500/25 shrink-0">
+              <Sun className="w-6 h-6 text-slate-950 stroke-[2.2]" />
+            </div>
+            <div>
+              <div className="font-bold text-sm tracking-wide text-white leading-tight">
+                SYSTOMECH
+              </div>
+              <div className="text-[10px] font-medium tracking-widest text-slate-300 uppercase leading-tight">
+                ENGINEERS
+              </div>
+              <div className="text-[9px] font-semibold tracking-wider text-amber-400 uppercase mt-0.5">
+                SOLAR CRM
+              </div>
+            </div>
           </div>
 
-          <nav className="px-3 space-y-1">
+          {/* Navigation Items */}
+          <nav className="space-y-1.5 pt-2">
             {visibleItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive =
+                activeTab === item.id ||
+                (item.id === 'customers' && activeTab === 'leads') ||
+                (item.id === 'products' && activeTab === 'inventory') ||
+                (item.id === 'field_operations' && activeTab === 'tasks') ||
+                (item.id === 'reports' && activeTab === 'audit') ||
+                (item.id === 'settings' && activeTab === 'audit');
 
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    if (item.id === 'customers') setActiveTab('leads');
+                    else if (item.id === 'products') setActiveTab('inventory');
+                    else if (item.id === 'field_operations') setActiveTab('tasks');
+                    else if (item.id === 'reports' || item.id === 'settings') setActiveTab('audit');
+                    else setActiveTab(item.id);
                     setMobileOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group cursor-pointer ${
+                  className={`w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all group cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/10 text-amber-300 border border-amber-500/30 shadow-sm'
-                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-white'
+                      ? 'bg-[#433419] text-[#FBBF24] font-semibold border border-[#6B5324]/50 shadow-sm'
+                      : 'text-slate-300 hover:bg-[#15203A] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${
-                        isActive
-                          ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-[#0B1120] shadow-sm shadow-amber-500/30 font-bold'
-                          : 'bg-slate-800/80 text-slate-400 group-hover:bg-slate-700 group-hover:text-amber-400'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </div>
-                    <div className="text-left">
-                      <div className={`leading-tight font-medium ${isActive ? 'text-white font-bold' : ''}`}>
-                        {item.label}
-                      </div>
-                      {item.hindiLabel && (
-                        <div
-                          className={`text-[10px] font-normal ${
-                            isActive ? 'text-amber-400/90' : 'text-slate-500'
-                          }`}
-                        >
-                          {item.hindiLabel}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Gold/Amber Active Indicator Pill */}
-                  {isActive && (
-                    <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-amber-400 to-orange-500 shadow-xs shadow-amber-400/50" />
-                  )}
+                  <Icon
+                    className={`w-4 h-4 shrink-0 transition-colors ${
+                      isActive ? 'text-[#FBBF24]' : 'text-slate-400 group-hover:text-amber-400'
+                    }`}
+                  />
+                  <span>{item.label}</span>
                 </button>
               );
             })}
           </nav>
         </div>
 
-        {/* Sidebar Footer Info Card */}
-        <div className="p-3.5 m-3 rounded-2xl bg-gradient-to-br from-slate-900 to-[#111A2E] border border-slate-800 text-xs space-y-2">
-          <div className="flex items-center gap-2 font-bold text-white">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-[#0B1120] flex items-center justify-center shadow-xs">
-              <Sun className="w-3.5 h-3.5 stroke-[2.5]" />
-            </div>
-            <span className="text-xs tracking-tight">Systomech Solar EPC</span>
-          </div>
-          <p className="text-[10px] text-slate-400 leading-tight">
-            Pune &bull; Nashik &bull; Mumbai &bull; Thane
-          </p>
-          <div className="flex items-center justify-between text-[10px] pt-1.5 border-t border-slate-800 font-semibold text-emerald-400">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              PM Surya Ghar DBT
-            </span>
-            <span className="text-slate-400">Online</span>
+        {/* Bottom Card - Exact Image 2 Sunset Photo Banner */}
+        <div className="p-4 m-3 rounded-2xl relative overflow-hidden shadow-lg border border-[#192440]">
+          <div
+            className="absolute inset-0 bg-cover bg-center brightness-75 scale-105"
+            style={{
+              backgroundImage:
+                'url("https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80")',
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+          <div className="relative z-10 pt-10 text-white space-y-0.5">
+            <h4 className="text-xs font-semibold leading-tight text-white drop-shadow-sm">
+              Clean Energy
+            </h4>
+            <h4 className="text-xs font-semibold leading-tight text-white drop-shadow-sm">
+              Brighter Future
+            </h4>
+            <p className="text-[10px] text-amber-300/90 font-medium pt-1">
+              Systomech Engineers
+            </p>
           </div>
         </div>
       </aside>

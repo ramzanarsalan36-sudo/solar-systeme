@@ -127,8 +127,8 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner with Real Context Field Photo */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#0B1120] text-white p-6 sm:p-7 border border-slate-800 shadow-xl">
+      {/* Header Banner with Infisparks High-Tech Navy Styling */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0A1128] via-[#0F1E3D] to-[#142952] text-white p-6 sm:p-7 border border-slate-800 shadow-xl">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{
@@ -184,7 +184,7 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shrink-0 transition-all ${
                 statusFilter === st
-                  ? 'bg-[#0B1120] text-amber-400 shadow-xs font-bold'
+                  ? 'bg-[#0F172A] text-amber-400 shadow-xs font-bold border border-slate-700'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -282,7 +282,7 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
                           onClick={(e) => handleQuickStageUpdate(task.id, s.id, e)}
                           className={`px-2 py-1.5 rounded-lg text-[10px] font-semibold text-left transition-all flex items-center gap-1.5 border ${
                             isCurrent
-                              ? 'bg-[#0B1120] text-amber-400 border-[#0B1120] shadow-xs font-bold'
+                              ? 'bg-[#0F172A] text-amber-400 border-slate-700 shadow-xs font-bold'
                               : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                           }`}
                         >
@@ -350,7 +350,7 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
       {newTaskModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 no-print">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
-            <div className="px-5 py-3.5 bg-[#10233F] text-white flex items-center justify-between">
+            <div className="px-5 py-3.5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-800">
               <h3 className="text-sm font-bold">Assign New Field Task</h3>
               <button onClick={() => setNewTaskModalOpen(false)} className="text-slate-300 hover:text-white">
                 &times;
@@ -468,7 +468,7 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 font-bold text-[#10233F] bg-[#F4B740] hover:bg-[#D99B26] rounded-lg"
+                  className="px-4 py-1.5 font-bold text-slate-950 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 hover:to-orange-600 rounded-lg shadow-sm cursor-pointer"
                 >
                   Create &amp; Assign Task
                 </button>

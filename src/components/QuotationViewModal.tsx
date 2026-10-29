@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Quotation, UserRole } from '@/types/crm';
 import { formatIndianCurrency } from '@/lib/solar-calc';
 import { generateWhatsAppMessage, generateEmailLink } from '@/lib/pdf-generator';
@@ -15,6 +15,9 @@ import {
   ShieldCheck,
   Building,
   RotateCw,
+  ArrowLeft,
+  FileDown,
+  Sparkles,
 } from 'lucide-react';
 
 interface QuotationViewModalProps {
@@ -32,6 +35,17 @@ export function QuotationViewModal({
   onOrderCreated,
   onRevisionCreated,
 }: QuotationViewModalProps) {
+  // Listen for Escape key to cleanly navigate back / close modal
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!quote) return null;
 
   const handlePrint = () => {
@@ -41,10 +55,9 @@ export function QuotationViewModal({
   const handleWhatsApp = () => {
     const url = generateWhatsAppMessage(quote);
     window.open(url, '_blank');
-    // Update quote status to shared if draft
     if (quote.status === 'draft') {
       quote.status = 'shared';
-      crmStorage.updateLead({} as any); // trigger storage update
+      crmStorage.updateLead({} as any);
     }
   };
 
@@ -57,7 +70,7 @@ export function QuotationViewModal({
     if (confirm(`Confirm order conversion for ${quote.customerName} (${quote.systemKw}kW)? This will initialize project execution and field assignments.`)) {
       const res = crmStorage.createOrderFromQuotation(quote.id);
       if (res.success) {
-        alert('Order created successfully! Field team and store have been notified.');
+        alert('Order created successfully! Field team and warehouse store have been notified.');
         if (onOrderCreated) onOrderCreated();
         onClose();
       } else {
@@ -80,39 +93,61 @@ export function QuotationViewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-4xl overflow-hidden my-4 print:my-0 print:border-none print:shadow-none">
-        {/* Action Header - Hidden on Print */}
-        <div className="px-6 py-3 bg-[#10233F] text-white flex flex-wrap items-center justify-between gap-3 no-print">
-          <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-0.5 rounded font-bold uppercase tracking-wider bg-[#F4B740] text-[#10233F]">
-              {quote.quoteNumber}
-            </span>
-            <span className="text-xs text-slate-300">
-              Revision: R{quote.revision || 0} &bull; {new Date(quote.createdAt).toLocaleDateString('en-IN')}
-            </span>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 print:p-0 print:bg-white"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 w-full max-w-4xl overflow-hidden my-3 print:my-0 print:border-none print:shadow-none print:w-full print:max-w-none">
+        {/* Sticky Action Header with Unmistakable Back Option - Hidden on Print */}
+        <div className="sticky top-0 z-20 px-4 sm:px-6 py-3 bg-[#0F172A] text-white flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 shadow-md no-print">
+          {/* Prominent Back Button & Quote Meta */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95 group"
+              title="Return to quotations list (or press Esc)"
+            >
+              <ArrowLeft className="w-4 h-4 stroke-[2.5] text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-700 hidden sm:block" />
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs px-2.5 py-0.5 rounded-md font-bold uppercase tracking-wider bg-amber-400 text-slate-950">
+                {quote.quoteNumber}
+              </span>
+              <span className="text-xs text-slate-300 hidden md:inline">
+                Rev: R{quote.revision || 0} &bull; {new Date(quote.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
           </div>
 
+          {/* Quick Actions (Print 1-Page PDF, WhatsApp, Convert) */}
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-800 hover:bg-slate-100 transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 transition-all shadow-md shadow-amber-500/20 cursor-pointer active:scale-95"
+              title="Print or Save as Single-Page A4 PDF"
             >
-              <Printer className="w-3.5 h-3.5 text-slate-600" />
-              <span>Print / PDF</span>
+              <Printer className="w-4 h-4 stroke-[2.5]" />
+              <span>Print / Save 1-Page PDF</span>
             </button>
 
             <button
               onClick={handleWhatsApp}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-xs cursor-pointer active:scale-95"
+              title="Send summary to client WhatsApp"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>WhatsApp Share</span>
+              <span className="hidden sm:inline">WhatsApp</span>
             </button>
 
             <button
               onClick={handleEmail}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#1b355d] hover:bg-[#25497f] text-white transition-colors"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-colors"
             >
               <Mail className="w-3.5 h-3.5" />
               <span>Email</span>
@@ -122,8 +157,8 @@ export function QuotationViewModal({
               <>
                 <button
                   onClick={handleCreateRevision}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/20 text-[#F4B740] hover:bg-amber-500/30 transition-colors"
-                  title="Create a new revision with historical preservation"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 border border-amber-500/30 transition-colors cursor-pointer"
+                  title="Create historical revision"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
                   <span>Revise</span>
@@ -131,262 +166,297 @@ export function QuotationViewModal({
 
                 <button
                   onClick={handleConvertToOrder}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#F4B740] hover:bg-[#D99B26] text-[#10233F] transition-colors shadow-sm"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-slate-950 transition-colors shadow-sm cursor-pointer"
+                  title="Convert this quote into a booked project"
                 >
-                  <CheckCircle className="w-3.5 h-3.5" />
-                  <span>Convert to Order</span>
+                  <CheckCircle className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span className="hidden sm:inline">Convert to Order</span>
                 </button>
               </>
             )}
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#1b355d]"
+              className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer ml-1"
+              title="Close (Esc)"
+              aria-label="Close"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Formal A4 Document Sheet */}
-        <div className="p-6 sm:p-10 text-slate-800 space-y-6 bg-white font-sans text-xs">
-          {/* Document Header */}
-          <div className="flex items-start justify-between border-b-2 border-[#10233F] pb-4">
-            <div className="space-y-1">
+        {/* ═══════════════════════════════════════════════════════════════
+            FORMAL SINGLE-PAGE A4 DOCUMENT SHEET (INFISPARKS COMPACT PRECISION)
+            Optimized to fit 100% on 1 Single A4 Page in Print/PDF
+            ═══════════════════════════════════════════════════════════════ */}
+        <div className="a4-document-sheet p-5 sm:p-7 print:p-0 text-slate-800 space-y-3 bg-white font-sans text-xs leading-snug">
+          {/* 1. Header (Company Identity + Quotation Reference) */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="flex items-start justify-between border-b-2 border-[#0F172A] pb-2"
+          >
+            <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-[#10233F] text-[#F4B740] flex items-center justify-center font-bold">
-                  <Sun className="w-5 h-5 stroke-[2.5]" />
+                <div className="w-7 h-7 rounded-lg bg-[#0F172A] text-amber-400 flex items-center justify-center font-bold shrink-0">
+                  <Sun className="w-4 h-4 stroke-[2.5]" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black tracking-tight text-[#10233F] leading-none">
+                  <h1 className="text-lg font-black tracking-tight text-[#0F172A] leading-none">
                     SYSTOMECH ENGINEERS
                   </h1>
-                  <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">
-                    Solar EPC, Rooftop Power Plants &amp; Energy Solutions
+                  <span className="text-[9.5px] text-slate-600 font-semibold uppercase tracking-wider block mt-0.5">
+                    Solar EPC &bull; Rooftop Power Plants &bull; PM Surya Ghar Approved Channel Partner
                   </span>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-600 pt-1">
-                Reg. Office: Office 402, Pride Silicon Plaza, Senapati Bapat Road, Pune - 411016
+              <p className="text-[9px] text-slate-500 pt-0.5 leading-tight">
+                Reg. Office: Office 402, Pride Silicon Plaza, Senapati Bapat Road, Pune - 411016 &bull; Branch: Satpur MIDC, Nashik - 422007
                 <br />
-                Branch: Satpur MIDC, Nashik - 422007 | Phone: +91 98201 12345 | Web: www.systomech.com
+                Phone: +91 98201 12345 &bull; Web: www.systomech.com &bull; GSTIN: 27AABCS1429Q1ZX &bull; MSME: UDYAM-MH-26-0048192
               </p>
-              <div className="flex items-center gap-3 text-[10px] text-slate-500">
-                <span><strong>GSTIN:</strong> 27AABCS1429Q1ZX</span>
-                <span>&bull;</span>
-                <span><strong>MSME:</strong> UDYAM-MH-26-0048192</span>
-              </div>
             </div>
 
-            <div className="text-right space-y-1">
-              <div className="text-base font-bold text-[#10233F]">SOLAR PROPOSAL</div>
-              <div className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 inline-block">
+            <div className="text-right shrink-0 space-y-0.5 pl-3">
+              <div className="text-xs font-black uppercase tracking-wider text-[#0F172A]">ROOFTOP SOLAR PROPOSAL</div>
+              <div className="text-[11px] font-bold text-amber-950 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 inline-block">
                 {quote.quoteNumber}
               </div>
-              <div className="text-[11px] text-slate-500">
+              <div className="text-[9.5px] text-slate-600">
                 Date: {new Date(quote.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
               </div>
-              <div className="text-[10px] text-slate-500">
-                Valid For: {quote.validityDays} Days
+              <div className="text-[9px] text-slate-500">
+                Validity: {quote.validityDays} Days &bull; Rev: R{quote.revision || 0}
               </div>
             </div>
           </div>
 
-          {/* Client & Site Details Grid */}
-          <div className="grid grid-cols-2 gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
+          {/* 2. Client & Grid Connection Details (2 Compact Columns) */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="grid grid-cols-2 gap-3 p-2.5 bg-slate-50 rounded-xl border border-slate-200/90 text-[10px]"
+          >
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Customer Details</span>
-              <p className="font-bold text-sm text-slate-900 mt-0.5">{quote.customerName}</p>
-              <p className="text-slate-600">Phone: {quote.customerPhone}</p>
-              {quote.customerEmail && <p className="text-slate-600">Email: {quote.customerEmail}</p>}
-              <p className="text-slate-600 mt-0.5">Site Address: {quote.siteAddress}, {quote.city}</p>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Customer Details</span>
+              <p className="font-bold text-xs text-slate-900 mt-0.5">{quote.customerName}</p>
+              <p className="text-slate-600">Phone: {quote.customerPhone} {quote.customerEmail ? `• ${quote.customerEmail}` : ''}</p>
+              <p className="text-slate-600 truncate">Site Address: {quote.siteAddress}, {quote.city}</p>
             </div>
             <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Utility &amp; Grid Connection</span>
-              <p className="font-semibold text-slate-800 mt-0.5">Discom: {quote.discom}</p>
-              <p className="text-slate-600">Consumer No: {quote.consumerNumber || 'To be updated from bill'}</p>
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Discom &amp; Grid Connection</span>
+              <p className="font-semibold text-slate-900 mt-0.5">Discom: {quote.discom}</p>
               <p className="text-slate-600">Sanctioned Load: {quote.sanctionLoadKw} kW &bull; Grid: {quote.phase === 'three' ? '3-Phase (415V)' : '1-Phase (230V)'}</p>
-              <p className="text-slate-600">Monthly Consumption: ~{quote.monthlyUnits} Units/month</p>
+              <p className="text-slate-600">Monthly Consumption: ~{quote.monthlyUnits} Units/month &bull; Consumer No: {quote.consumerNumber || 'To be updated from bill'}</p>
             </div>
           </div>
 
-          {/* Technical Specifications Highlights */}
-          <div>
-            <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider pb-1 mb-2 border-b border-slate-200">
-              System Configuration &amp; Equipment
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-              <div className="p-2.5 rounded-lg border border-slate-200 bg-white">
-                <span className="text-[10px] text-slate-500 block">Plant Capacity</span>
-                <span className="font-bold text-sm text-[#10233F]">{quote.systemKw} kWp</span>
-              </div>
-              <div className="p-2.5 rounded-lg border border-slate-200 bg-white">
-                <span className="text-[10px] text-slate-500 block">Solar Modules</span>
-                <span className="font-bold text-xs text-slate-800">{quote.panelQty}x {quote.panelWattage}Wp Bifacial</span>
-              </div>
-              <div className="p-2.5 rounded-lg border border-slate-200 bg-white">
-                <span className="text-[10px] text-slate-500 block">Grid Inverter</span>
-                <span className="font-bold text-xs text-slate-800">{quote.inverterModel.split(' ')[0]} {quote.phase === 'three' ? '3-Ph' : '1-Ph'}</span>
-              </div>
-              <div className="p-2.5 rounded-lg border border-slate-200 bg-white">
-                <span className="text-[10px] text-slate-500 block">Mounting Structure</span>
-                <span className="font-bold text-xs text-slate-800 truncate block" title={quote.structureType}>
-                  {quote.structureType.split(' ')[0]} HDG Kit
-                </span>
-              </div>
+          {/* 3. System Configuration Highlights (4 Mini Tiles) */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="grid grid-cols-4 gap-2 text-center text-[10px]"
+          >
+            <div className="p-1.5 rounded-lg border border-slate-200 bg-white">
+              <span className="text-[9px] text-slate-400 uppercase font-semibold block">Plant Capacity</span>
+              <span className="font-black text-xs sm:text-sm text-[#0F172A]">{quote.systemKw} kWp</span>
             </div>
-          </div>
-
-          {/* Itemized Line Items Table */}
-          <div>
-            <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider pb-1 mb-2 border-b border-slate-200">
-              Scope of Supply &amp; Itemized Bill of Materials
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse border border-slate-200">
-                <thead>
-                  <tr className="bg-[#10233F] text-white text-[11px]">
-                    <th className="p-2 border border-slate-700">#</th>
-                    <th className="p-2 border border-slate-700">Item Description</th>
-                    <th className="p-2 border border-slate-700">Specification / Brand</th>
-                    <th className="p-2 border border-slate-700 text-center">Qty</th>
-                    <th className="p-2 border border-slate-700 text-center">UoM</th>
-                    <th className="p-2 border border-slate-700 text-right">Unit Rate (₹)</th>
-                    <th className="p-2 border border-slate-700 text-right">Total (₹)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 text-[11px]">
-                  {quote.lineItems.map((item, idx) => (
-                    <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
-                      <td className="p-2 border border-slate-200 text-slate-500 text-center">{idx + 1}</td>
-                      <td className="p-2 border border-slate-200 font-semibold text-slate-900">{item.productName}</td>
-                      <td className="p-2 border border-slate-200 text-slate-600 text-[10px]">{item.spec}</td>
-                      <td className="p-2 border border-slate-200 text-center font-medium">{item.quantity}</td>
-                      <td className="p-2 border border-slate-200 text-center text-slate-500">{item.uom}</td>
-                      <td className="p-2 border border-slate-200 text-right">{item.unitPrice.toLocaleString('en-IN')}</td>
-                      <td className="p-2 border border-slate-200 text-right font-semibold">{item.lineTotal.toLocaleString('en-IN')}</td>
-                    </tr>
-                  ))}
-                  <tr className="bg-slate-50">
-                    <td colSpan={6} className="p-2 border border-slate-200 font-medium text-slate-700 text-right">
-                      Net Metering Liaison &amp; Discom Inspection Charges:
-                    </td>
-                    <td className="p-2 border border-slate-200 text-right font-medium">
-                      {quote.netMeteringCharge.toLocaleString('en-IN')}
-                    </td>
-                  </tr>
-                  <tr className="bg-slate-50">
-                    <td colSpan={6} className="p-2 border border-slate-200 font-medium text-slate-700 text-right">
-                      Civil Grouting, Electrical Wiring &amp; Commissioning Labor:
-                    </td>
-                    <td className="p-2 border border-slate-200 text-right font-medium">
-                      {quote.installationCharge.toLocaleString('en-IN')}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="p-1.5 rounded-lg border border-slate-200 bg-white">
+              <span className="text-[9px] text-slate-400 uppercase font-semibold block">Solar Modules</span>
+              <span className="font-bold text-[11px] text-slate-800">{quote.panelQty}x {quote.panelWattage}Wp Bifacial</span>
             </div>
-          </div>
-
-          {/* Pricing Summary & Subsidy Matrix */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
-            {/* ROI & Generation */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
-                25-Year Performance &amp; Savings Projections
+            <div className="p-1.5 rounded-lg border border-slate-200 bg-white">
+              <span className="text-[9px] text-slate-400 uppercase font-semibold block">Grid Inverter</span>
+              <span className="font-bold text-[11px] text-slate-800">{quote.inverterModel.split(' ')[0]} {quote.phase === 'three' ? '3-Ph' : '1-Ph'}</span>
+            </div>
+            <div className="p-1.5 rounded-lg border border-slate-200 bg-white">
+              <span className="text-[9px] text-slate-400 uppercase font-semibold block">Mounting Kit</span>
+              <span className="font-bold text-[11px] text-slate-800 truncate block">
+                {quote.structureType.split(' ')[0]} HDG Kit
               </span>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="text-[10px] text-slate-500 block">Annual Generation</span>
-                  <span className="font-bold text-slate-800">{quote.annualGenerationUnits.toLocaleString('en-IN')} Units</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 block">Annual Bill Savings</span>
-                  <span className="font-bold text-emerald-700">{formatIndianCurrency(quote.annualElectricitySavings)} / yr</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 block">Simple Payback</span>
-                  <span className="font-bold text-[#10233F]">~{quote.paybackYears} Years</span>
-                </div>
-                <div>
-                  <span className="text-[10px] text-slate-500 block">25-Yr Lifetime Savings</span>
-                  <span className="font-bold text-emerald-700">{formatIndianCurrency(quote.twentyFiveYearSavings)}</span>
+            </div>
+          </div>
+
+          {/* 4. Scope of Supply & Itemized Bill of Materials Table */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="overflow-hidden rounded-lg border border-slate-200"
+          >
+            <table className="w-full text-left border-collapse text-[10px]">
+              <thead>
+                <tr className="bg-[#0F172A] text-white">
+                  <th className="py-1 px-2 text-center w-8">#</th>
+                  <th className="py-1 px-2">Item Description</th>
+                  <th className="py-1 px-2">Specification / Brand</th>
+                  <th className="py-1 px-2 text-center w-12">Qty</th>
+                  <th className="py-1 px-2 text-center w-12">UoM</th>
+                  <th className="py-1 px-2 text-right w-20">Unit Rate (₹)</th>
+                  <th className="py-1 px-2 text-right w-24">Total (₹)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {quote.lineItems.map((item, idx) => (
+                  <tr key={item.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
+                    <td className="py-1 px-2 text-slate-500 text-center font-medium">{idx + 1}</td>
+                    <td className="py-1 px-2 font-bold text-slate-900">{item.productName}</td>
+                    <td className="py-1 px-2 text-slate-600 text-[9.5px] truncate max-w-[280px]">{item.spec}</td>
+                    <td className="py-1 px-2 text-center font-bold">{item.quantity}</td>
+                    <td className="py-1 px-2 text-center text-slate-500">{item.uom}</td>
+                    <td className="py-1 px-2 text-right text-slate-700">{item.unitPrice.toLocaleString('en-IN')}</td>
+                    <td className="py-1 px-2 text-right font-bold text-slate-900">{item.lineTotal.toLocaleString('en-IN')}</td>
+                  </tr>
+                ))}
+                <tr className="bg-slate-50 font-medium">
+                  <td colSpan={6} className="py-1 px-2 text-slate-700 text-right">
+                    Net Metering Liaison &amp; Discom Inspection Charges:
+                  </td>
+                  <td className="py-1 px-2 text-right font-semibold text-slate-900">
+                    {quote.netMeteringCharge.toLocaleString('en-IN')}
+                  </td>
+                </tr>
+                <tr className="bg-slate-50 font-medium">
+                  <td colSpan={6} className="py-1 px-2 text-slate-700 text-right">
+                    Civil Grouting, Electrical Wiring &amp; Commissioning Labor:
+                  </td>
+                  <td className="py-1 px-2 text-right font-semibold text-slate-900">
+                    {quote.installationCharge.toLocaleString('en-IN')}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* 5. Pricing Summary & ROI Matrix (2 Columns) */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="grid grid-cols-2 gap-3"
+          >
+            {/* Left: 25-Year Performance Projections */}
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[10px] space-y-1.5 flex flex-col justify-between">
+              <div>
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
+                  25-Year Performance &amp; Savings Projections
+                </span>
+                <div className="grid grid-cols-2 gap-2 mt-1">
+                  <div>
+                    <span className="text-[9px] text-slate-500 block">Annual Generation</span>
+                    <span className="font-bold text-slate-900 text-[11px]">{quote.annualGenerationUnits.toLocaleString('en-IN')} Units</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 block">Annual Bill Savings</span>
+                    <span className="font-bold text-emerald-700 text-[11px]">{formatIndianCurrency(quote.annualElectricitySavings)} / yr</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 block">Simple Payback</span>
+                    <span className="font-bold text-[#0F172A] text-[11px]">~{quote.paybackYears} Years</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] text-slate-500 block">25-Yr Lifetime Savings</span>
+                    <span className="font-bold text-emerald-700 text-[11px]">{formatIndianCurrency(quote.twentyFiveYearSavings)}</span>
+                  </div>
                 </div>
               </div>
-              <p className="text-[10px] text-slate-500 pt-1">
-                *Projections based on MNRE benchmark generation of 4.2 units/kW/day and standard Discom tariffs.
+              <p className="text-[8.5px] text-slate-500 border-t border-slate-200/80 pt-1">
+                *MNRE generation benchmark: 4.2 units/kW/day under Maharashtra solar insolation.
               </p>
             </div>
 
-            {/* Financial Summary */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5">
+            {/* Right: Commercial Financial Breakdown */}
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[10px] space-y-1">
               <div className="flex justify-between text-slate-600">
                 <span>Taxable Amount (Goods &amp; Services):</span>
-                <span>{formatIndianCurrency(quote.taxableAmount)}</span>
+                <span className="font-semibold">{formatIndianCurrency(quote.taxableAmount)}</span>
               </div>
               <div className="flex justify-between text-slate-600">
                 <span>GST ({quote.gstRate}% Composite Solar):</span>
-                <span>{formatIndianCurrency(quote.gstAmount)}</span>
+                <span className="font-semibold">{formatIndianCurrency(quote.gstAmount)}</span>
               </div>
-              <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200">
+              <div className="flex justify-between font-bold text-slate-900 pt-0.5 border-t border-slate-200">
                 <span>Total Project Gross Value:</span>
                 <span>{formatIndianCurrency(quote.totalGrossPrice)}</span>
               </div>
-              <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+              <div className="flex justify-between items-center text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 <div>
                   <span>Less: PM Surya Ghar Central Subsidy</span>
-                  <span className="text-[9px] block text-emerald-600 font-normal">
-                    {quote.subsidyEligibilityStatus === 'verified' ? 'Eligible for Direct DBT' : 'Subject to National Portal Verification'}
+                  <span className="text-[8.5px] block text-emerald-700 font-normal">
+                    {quote.subsidyEligibilityStatus === 'verified' ? 'Eligible for Direct DBT to Bank' : 'Subject to National Portal Verification'}
                   </span>
                 </div>
-                <span>-{formatIndianCurrency(quote.subsidyAmount)}</span>
+                <span className="text-xs font-black">-{formatIndianCurrency(quote.subsidyAmount)}</span>
               </div>
-              <div className="flex justify-between items-center font-bold text-sm text-[#10233F] bg-amber-100/70 p-2 rounded-lg border border-amber-300">
+              <div className="flex justify-between items-center font-bold text-xs text-[#0F172A] bg-amber-100 px-2 py-1.5 rounded-lg border border-amber-300">
                 <span>NET PAYABLE BY CUSTOMER:</span>
-                <span className="text-base text-amber-950 font-black">
+                <span className="text-sm font-black text-amber-950">
                   {formatIndianCurrency(quote.netPayableCustomer)}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Mandatory Legal Disclaimer Banner */}
-          <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-xs text-amber-950 flex items-start gap-2.5">
-            <ShieldCheck className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-            <p className="leading-relaxed text-[11px]">
-              <strong>Disclaimer:</strong> Subsidy amounts shown are estimates calculated under PM Surya Ghar Muft Bijli Yojana guidelines. Final approval, net metering, and DBT disbursement are subject to DISCOM inspection and National Portal approval.
+          {/* 6. Compact Disclaimer Banner */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="p-1.5 px-2 bg-amber-50/80 border border-amber-200 rounded-lg text-[9px] text-amber-950 flex items-center gap-1.5"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <p>
+              <strong>Disclaimer:</strong> Subsidy amounts are calculated under PM Surya Ghar Muft Bijli Yojana guidelines. Final approval, net metering, and DBT disbursement are subject to DISCOM inspection and National Portal approval.
             </p>
           </div>
 
-          {/* Payment Terms & Bank Details */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-200 text-[11px]">
+          {/* 7. Payment Terms & Bank Details (2 Columns) */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="grid grid-cols-2 gap-3 pt-1 border-t border-slate-200 text-[9.5px]"
+          >
             <div>
-              <span className="font-bold text-slate-800 block mb-1">Standard Payment Schedule:</span>
-              <ul className="list-disc list-inside space-y-0.5 text-slate-600 text-[10px]">
-                <li><strong>20% Token Advance:</strong> Upon confirmation of order &amp; site feasibility survey.</li>
-                <li><strong>60% Material Dispatch:</strong> Upon dispatch of panels, structure &amp; inverter from warehouse.</li>
-                <li><strong>20% Final Commissioning:</strong> Post Discom net-meter testing &amp; plant synchronization.</li>
+              <span className="font-bold text-slate-900 block mb-0.5">Payment Terms:</span>
+              <ul className="list-disc list-inside space-y-0.2 text-slate-600 text-[9px]">
+                <li><strong>20% Token Advance:</strong> Order booking &amp; site feasibility survey.</li>
+                <li><strong>60% Material Dispatch:</strong> Upon dispatch of panels &amp; inverter.</li>
+                <li><strong>20% Final Commissioning:</strong> Post Discom net-meter synchronization.</li>
               </ul>
             </div>
             <div>
-              <span className="font-bold text-slate-800 block mb-1">Bank Account for RTGS / NEFT / IMPS:</span>
-              <div className="text-[10px] text-slate-700 space-y-0.5 bg-slate-50 p-2 rounded border border-slate-200">
-                <p><strong>Account Name:</strong> Systomech Engineers</p>
-                <p><strong>Bank Name:</strong> HDFC Bank Ltd &bull; <strong>Branch:</strong> SB Road, Pune</p>
-                <p><strong>Current A/c No:</strong> 50200084920194 &bull; <strong>IFSC:</strong> HDFC0000039</p>
+              <span className="font-bold text-slate-900 block mb-0.5">Bank Details for RTGS / NEFT / IMPS:</span>
+              <div className="text-[9px] text-slate-700 space-y-0.2 bg-slate-50 p-1.5 rounded border border-slate-200">
+                <p><strong>A/c Name:</strong> Systomech Engineers &bull; <strong>Bank:</strong> HDFC Bank Ltd</p>
+                <p><strong>Current A/c:</strong> 50200084920194 &bull; <strong>IFSC:</strong> HDFC0000039 &bull; <strong>Branch:</strong> SB Road, Pune</p>
               </div>
             </div>
           </div>
 
-          {/* Footer Sign-off */}
-          <div className="pt-6 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+          {/* 8. Footer Sign-off Block */}
+          <div
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className="pt-2 border-t border-slate-200 flex items-center justify-between text-[9.5px] text-slate-600"
+          >
             <div>
-              <p className="font-bold text-slate-800">For Systomech Engineers</p>
-              <p className="text-[10px] text-slate-500 mt-6">Authorized Signatory / Technical Head</p>
+              <p className="font-bold text-slate-900">For Systomech Engineers</p>
+              <p className="text-[8.5px] text-slate-400 mt-3">Authorized Signatory / Technical Lead</p>
             </div>
             <div className="text-right">
-              <p className="font-bold text-slate-800">Customer Acceptance</p>
-              <p className="text-[10px] text-slate-500 mt-6">Sign &amp; Date: ___________________</p>
+              <p className="font-bold text-slate-900">Customer Acceptance</p>
+              <p className="text-[8.5px] text-slate-400 mt-3">Signature &amp; Date: ___________________</p>
+            </div>
+          </div>
+
+          {/* 9. Bottom Navigation Bar for Interactive Screen Viewing - Hidden on Print */}
+          <div className="no-print pt-3 mt-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+            <button
+              onClick={onClose}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 transition-all cursor-pointer shadow-2xs active:scale-95"
+            >
+              <ArrowLeft className="w-4 h-4 text-slate-700" />
+              <span>← Back to Quotations</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrint}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-slate-950 shadow-md shadow-amber-500/20 transition-all cursor-pointer active:scale-95"
+              >
+                <Printer className="w-4 h-4 stroke-[2.5]" />
+                <span>Save 1-Page PDF / Print</span>
+              </button>
             </div>
           </div>
         </div>

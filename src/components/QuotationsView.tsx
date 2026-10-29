@@ -84,7 +84,7 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
               onClick={() => setStatusFilter(st)}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shrink-0 transition-all ${
                 statusFilter === st
-                  ? 'bg-[#0B1120] text-amber-400 shadow-xs font-bold'
+                  ? 'bg-[#0F172A] text-amber-400 shadow-xs font-bold border border-slate-700'
                   : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -169,7 +169,7 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
                       {/* View & Print */}
                       <button
                         onClick={() => onSelectQuoteToView(quote)}
-                        className="p-1.5 rounded-lg bg-[#10233F] text-[#F4B740] hover:bg-[#1b355d] transition-colors"
+                        className="p-1.5 rounded-lg bg-[#0F172A] text-amber-400 hover:bg-slate-800 transition-colors border border-slate-700"
                         title="View Formal PDF Quotation"
                       >
                         <Eye className="w-3.5 h-3.5" />

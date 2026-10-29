@@ -1,25 +1,24 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Poppins } from 'next/font/google';
 import './globals.css';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-plus-jakarta-sans',
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Systomech Engineers — Solar CRM | Rooftop EPC & Operations',
+  title: 'SYSTOMECH ENGINEERS — Solar CRM & Operations Platform',
   description:
-    'Production-grade Solar CRM for Systomech Engineers: Lead intake, PM Surya Ghar bill-to-quote sizing, live inventory ledger, order tracking, and field tasks.',
+    'Solar CRM for Systomech Engineers: Powering a greener tomorrow with customer lead pipeline, quotations, orders, inventory stock, and field tasks.',
   keywords: [
     'Solar CRM',
     'Systomech Engineers',
-    'Rooftop Solar',
+    'Solar EPC',
     'PM Surya Ghar',
     'Solar Quotation',
-    'Solar EPC Maharashtra',
     'Solar Inventory Management',
   ],
 };
@@ -30,8 +29,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full antialiased ${plusJakartaSans.variable}`} suppressHydrationWarning>
-      <body className={`min-h-full flex flex-col bg-[#F8FAFC] text-[#172033] ${plusJakartaSans.className}`} suppressHydrationWarning>
+    <html lang="en" className={`h-full antialiased ${poppins.variable}`} suppressHydrationWarning>
+      <body className={`min-h-full flex flex-col bg-[#F3F5F9] text-[#1E293B] font-sans antialiased`} style={{ fontFamily: "var(--font-poppins), 'Poppins', sans-serif" }} suppressHydrationWarning>
         {children}
       </body>
     </html>

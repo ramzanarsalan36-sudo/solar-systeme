@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Lead, LeadSource } from '@/types/crm';
-import { X, UserPlus, Phone, AlertTriangle, Calendar, CheckCircle } from 'lucide-react';
+import { X, UserPlus, Phone, AlertTriangle, Calendar, CheckCircle, ArrowLeft } from 'lucide-react';
 
 interface LeadModalProps {
   isOpen: boolean;
@@ -100,22 +100,53 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
     onClose();
   };
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl overflow-hidden my-6">
-        <div className="px-6 py-4 bg-[#10233F] text-white flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#F4B740] text-[#10233F] flex items-center justify-center font-bold">
-              <UserPlus className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold tracking-tight">Capture Solar Inquiry / Lead</h2>
-              <p className="text-xs text-slate-300">New lead intake with duplicate detection &amp; follow-up scheduler</p>
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 w-full max-w-2xl overflow-hidden my-6">
+        <div className="px-5 sm:px-6 py-3.5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95"
+              title="Return to previous screen (or press Esc)"
+            >
+              <ArrowLeft className="w-4 h-4 stroke-[2.5] text-amber-400" />
+              <span>Back</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-700 hidden sm:block" />
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold shrink-0">
+                <UserPlus className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm sm:text-base font-bold tracking-tight">Capture Solar Inquiry / Lead</h2>
+                <p className="text-[11px] text-slate-400 hidden sm:block">New lead intake with duplicate detection &amp; follow-up scheduler</p>
+              </div>
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-[#1b355d]"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Close (Esc)"
           >
             <X className="w-5 h-5" />
           </button>
@@ -313,7 +344,7 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 font-bold text-[#10233F] bg-[#F4B740] hover:bg-[#D99B26] rounded-xl transition-colors shadow-sm"
+              className="px-5 py-2 font-bold text-[#0F172A] bg-[#F59E0B] hover:bg-[#D97706] rounded-xl transition-colors shadow-sm"
             >
               Save Lead &amp; Follow-up
             </button>
