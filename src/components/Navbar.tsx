@@ -6,11 +6,14 @@ import { crmStorage } from '@/lib/storage';
 import { INITIAL_USERS } from '@/lib/initial-data';
 import { RoleBadge } from './RoleBadge';
 import {
-  Search,
+  Sun,
   Bell,
+  PlusCircle,
+  Calculator,
+  ChevronDown,
   Menu,
   X,
-  ChevronDown,
+  AlertTriangle,
   RotateCcw,
   Sparkles,
   Search,

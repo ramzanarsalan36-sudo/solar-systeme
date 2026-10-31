@@ -5,14 +5,13 @@ import { UserRole } from '@/types/crm';
 import {
   LayoutDashboard,
   Users,
-  UserCheck,
-  FileText,
-  ShoppingBag,
-  Boxes,
-  CheckSquare,
+  Calculator,
+  FileSpreadsheet,
+  PackageCheck,
+  Warehouse,
   Wrench,
-  BarChart3,
-  Settings,
+  Boxes,
+  ShieldAlert,
   Sun,
   Sparkles,
 } from 'lucide-react';
@@ -117,23 +116,13 @@ export function Sidebar({ activeTab, setActiveTab, role, mobileOpen, setMobileOp
           <nav className="px-2.5 space-y-0.5">
             {visibleItems.map((item) => {
               const Icon = item.icon;
-              const isActive =
-                activeTab === item.id ||
-                (item.id === 'customers' && activeTab === 'leads') ||
-                (item.id === 'products' && activeTab === 'inventory') ||
-                (item.id === 'field_operations' && activeTab === 'tasks') ||
-                (item.id === 'reports' && activeTab === 'audit') ||
-                (item.id === 'settings' && activeTab === 'audit');
+              const isActive = activeTab === item.id;
 
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    if (item.id === 'customers') setActiveTab('leads');
-                    else if (item.id === 'products') setActiveTab('inventory');
-                    else if (item.id === 'field_operations') setActiveTab('tasks');
-                    else if (item.id === 'reports' || item.id === 'settings') setActiveTab('audit');
-                    else setActiveTab(item.id);
+                    setActiveTab(item.id);
                     setMobileOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors group cursor-pointer ${

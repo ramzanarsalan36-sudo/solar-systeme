@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Lead, LeadSource } from '@/types/crm';
 import { calculateSolarSystem, formatIndianCurrency } from '@/lib/solar-calc';
