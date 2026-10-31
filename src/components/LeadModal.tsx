@@ -126,6 +126,16 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
     onClose();
   };
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 no-print animate-in fade-in duration-150">
       <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200/90 w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden">
@@ -145,6 +155,7 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             aria-label="Close"

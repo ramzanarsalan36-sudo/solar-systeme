@@ -23,6 +23,9 @@ import {
   Sparkles,
   MapPin,
   Share2,
+  Calendar,
+  Check,
+  ChevronRight,
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -73,6 +76,16 @@ export function DashboardView({
       roofType: 'rcc_flat',
     });
   }, [quickBill]);
+
+  // Quick Preset Bills
+  const presets = [
+    { label: '₹1,500/mo (Small 1.5kW)', value: 1500 },
+    { label: '₹3,800/mo (Standard 3.3kW)', value: 3800 },
+    { label: '₹7,500/mo (Large 6.6kW)', value: 7500 },
+    { label: '₹15,000/mo (Commercial 12kW)', value: 15000 },
+  ];
+
+  const collectionPercentage = totalOrderValue > 0 ? Math.round((totalPaidRevenue / totalOrderValue) * 100) : 0;
 
   return (
     <div className="space-y-5">
@@ -132,8 +145,8 @@ export function DashboardView({
                 onClick={onOpenStockModal}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
               >
-                <Warehouse className="w-4 h-4" />
-                <span>Record Stock Movement</span>
+                <Warehouse className="w-4 h-4 stroke-[2.5]" />
+                <span>Record Stock GRN / Dispatch</span>
               </button>
             )}
           </div>
@@ -171,6 +184,7 @@ export function DashboardView({
           onClick={() => setActiveTab(role === 'store_field' ? 'tasks' : 'leads')}
           className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
         >
+          <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-indigo-600 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Field Site Tasks' : 'Active Inquiries'}
@@ -192,11 +206,12 @@ export function DashboardView({
           </p>
         </div>
 
-        {/* Card 2: Quotations / Catalog */}
+        {/* Card 2: Quotations / Stock SKUs */}
         <div
           onClick={() => setActiveTab(role === 'store_field' ? 'inventory' : 'quotations')}
           className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
         >
+          <div className="h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Master Hardware' : 'Quotations Pipeline'}
@@ -223,6 +238,7 @@ export function DashboardView({
           onClick={() => setActiveTab('orders')}
           className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
         >
+          <div className="h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-600 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Live Plants' : 'Projects Booked'}
@@ -247,6 +263,11 @@ export function DashboardView({
           onClick={() => setActiveTab(role === 'sales' ? 'leads' : 'inventory')}
           className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
         >
+          <div className={`h-1 w-full absolute top-0 left-0 ${
+            (role === 'sales' ? dueTodayFollowups.length : lowStockProducts.length) > 0
+              ? 'bg-gradient-to-r from-rose-500 to-red-600'
+              : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+          }`} />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'sales' ? 'Follow-ups Due Today' : 'Low Stock Alerts'}
@@ -333,6 +354,7 @@ export function DashboardView({
                     onChange={(e) => setQuickBill(Number(e.target.value))}
                     className="w-24 px-2 py-1 text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg text-right focus:border-amber-500 focus:outline-hidden"
                   />
+                  <span className="text-xs text-slate-500 font-medium">/mo</span>
                 </div>
               </div>
 
@@ -446,9 +468,9 @@ export function DashboardView({
                       </div>
                       <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize shrink-0 ${
                         task.status === 'completed'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                           : task.status === 'in_progress'
-                          ? 'bg-amber-100 text-amber-800'
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200'
                           : 'bg-slate-200 text-slate-700'
                       }`}>
                         {task.status.replace('_', ' ')}
@@ -465,7 +487,7 @@ export function DashboardView({
 
                     <div className="pt-1.5 border-t border-slate-200/60 flex items-center justify-between text-[11px]">
                       <span className="text-slate-500">
-                        Checklist: {doneChecks} of {totalChecks} done
+                        Field Checklist: {doneChecks} of {totalChecks} done
                       </span>
                       <span className="font-medium text-emerald-700">
                         {Math.round((doneChecks / (totalChecks || 1)) * 100)}%
@@ -567,7 +589,7 @@ export function DashboardView({
                             Due Today
                           </span>
                         )}
-                        <span className="text-[10px] text-slate-400 capitalize">via {fup.contactMethod}</span>
+                        <span className="text-[10px] text-slate-500 capitalize">via {fup.contactMethod}</span>
                       </div>
                       <p className="text-xs text-slate-600 leading-snug">{fup.interactionSummary}</p>
                       <p className="text-[11px] text-amber-800 font-medium flex items-center gap-1">
@@ -584,7 +606,7 @@ export function DashboardView({
                           )}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors"
+                          className="p-2 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors border border-emerald-200"
                           title="WhatsApp Follow-up"
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -640,6 +662,20 @@ export function DashboardView({
               <div className="flex justify-between text-rose-700 pt-1.5 border-t border-slate-200">
                 <span>Pending Balance Due:</span>
                 <span className="font-semibold">{formatIndianCurrency(totalBalanceDue)}</span>
+              </div>
+
+              {/* Visual Progress Bar */}
+              <div className="pt-1">
+                <div className="flex justify-between text-[10px] text-slate-500 font-medium mb-1">
+                  <span>Collection Milestone</span>
+                  <span>{collectionPercentage}% Realized</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                  <div
+                    className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${collectionPercentage}%` }}
+                  />
+                </div>
               </div>
             </div>
 

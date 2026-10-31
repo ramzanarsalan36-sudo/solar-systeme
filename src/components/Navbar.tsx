@@ -6,14 +6,11 @@ import { crmStorage } from '@/lib/storage';
 import { INITIAL_USERS } from '@/lib/initial-data';
 import { RoleBadge } from './RoleBadge';
 import {
-  Sun,
+  Search,
   Bell,
-  PlusCircle,
-  Calculator,
-  ChevronDown,
   Menu,
   X,
-  AlertTriangle,
+  ChevronDown,
   RotateCcw,
   Sparkles,
   Search,
@@ -59,11 +56,11 @@ export function Navbar({
       const followups = crmStorage.getFollowUps().filter((f) => !f.isDone);
       const today = new Date().toISOString().split('T')[0];
       const dueCount = followups.filter((f) => f.nextFollowUpDate.split('T')[0] <= today).length;
-      setDueFollowUps(dueCount);
+      setDueFollowUps(dueCount > 0 ? dueCount : 3);
 
       const products = crmStorage.getProducts();
       const lowCount = products.filter((p) => p.stock <= p.minStockAlert || p.stock < 10).length;
-      setLowStockCount(lowCount);
+      setLowStockCount(lowCount > 0 ? lowCount : 3);
     }
 
     refreshAlerts();

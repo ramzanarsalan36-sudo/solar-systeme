@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════
+   SYSTOMECH SOLAR CRM — INFISPARKS PRODUCTION DESIGN SYSTEM
+   Font: Poppins (Clean, Elegant, Easy to read, Light/Medium weights)
+   Palette: Deep Slate Navy (#0B132B) + Warm Amber (#F59E0B / #D97706) + Neutral Cards
+   ═══════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
     --canvas: #F8FAFC;
@@ -37,23 +43,51 @@
 
 /* Print styling for professional A4 quotations */
 @media print {
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
+  @page {
+    size: A4 portrait;
+    margin: 5mm 7mm;
   }
+
+  html, body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 8.8pt !important;
+    line-height: 1.25 !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .no-print {
     display: none !important;
   }
+
   .print-only {
     display: block !important;
   }
-  @page {
-    size: A4 portrait;
-    margin: 12mm;
+
+  .a4-document-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 
-/* Custom scrollbars */
+/* Custom modern sleek scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;

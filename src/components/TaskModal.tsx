@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Task, TaskStatus } from '@/types/crm';
 import {
@@ -66,6 +66,16 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
     }
   }, [task]);
 
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !task) return null;
 
   const handleToggleChecklist = (checkId: string) => {
@@ -130,6 +140,7 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
