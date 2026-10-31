@@ -1,5 +1,7 @@
 'use client';
 
+import { soundManager } from '@/lib/sound';
+
 import React, { useState } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Product, ProductCategory, UserRole } from '@/types/crm';
@@ -69,13 +71,13 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E1EBF5]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
+          <div className="w-8 h-8 rounded-lg bg-[#E8F8FE] border border-[#BCE8FC] text-[#00BAF2] flex items-center justify-center font-medium">
             <Boxes className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-semibold text-[#002E6E] tracking-tight">
               Product &amp; Pricing Master
             </h1>
             <p className="text-xs text-slate-500 font-normal">
@@ -109,7 +111,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
 
       {/* Category Tabs & Filter Toolbar */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5">
-        <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg overflow-x-auto border border-slate-200/80">
+        <div className="flex items-center gap-1 p-0.5 bg-slate-100 rounded-lg overflow-x-auto border border-[#E1EBF5]/80">
           {[
             { id: 'all', label: 'All Products', count: products.length },
             { id: 'panel', label: 'Panels', count: products.filter((p) => p.category === 'panel').length },
@@ -125,8 +127,8 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
               }}
               className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 categoryFilter === tab.id && activeTab === 'catalog'
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-[#002E6E] shadow-2xs font-semibold'
+                  : 'text-slate-600 hover:text-[#002E6E]'
               }`}
             >
               {tab.label}
@@ -138,8 +140,8 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
             onClick={() => setActiveTab('price_history')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1 cursor-pointer ${
               activeTab === 'price_history'
-                ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#002E6E] shadow-2xs font-semibold'
+                : 'text-slate-600 hover:text-[#002E6E]'
             }`}
           >
             <History className="w-3 h-3 text-amber-500" />
@@ -156,16 +158,16 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search model, brand, spec..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
+              className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-[#E1EBF5] bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
             />
           </div>
 
           {activeTab === 'catalog' && (
-            <div className="flex items-center p-0.5 bg-slate-100 rounded-lg border border-slate-200/80">
+            <div className="flex items-center p-0.5 bg-slate-100 rounded-lg border border-[#E1EBF5]/80">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'grid' ? 'bg-white text-[#002E6E] shadow-2xs' : 'text-slate-500 hover:text-[#002E6E]'
                 }`}
                 title="Grid View"
               >
@@ -174,7 +176,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
               <button
                 onClick={() => setViewMode('table')}
                 className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  viewMode === 'table' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                  viewMode === 'table' ? 'bg-white text-[#002E6E] shadow-2xs' : 'text-slate-500 hover:text-[#002E6E]'
                 }`}
                 title="Table View"
               >
@@ -194,13 +196,13 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
               return (
                 <div
                   key={p.id}
-                  className="bg-white rounded-xl border border-slate-200 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all overflow-hidden flex flex-col justify-between"
+                  className="bg-white rounded-xl border border-[#E1EBF5] shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all overflow-hidden flex flex-col justify-between"
                 >
                   <div>
                     {/* Header Banner with Clean Icon */}
                     <div className="h-28 bg-slate-50 border-b border-slate-100 p-3 flex flex-col justify-between relative">
                       <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wider bg-white border border-slate-200 text-slate-700">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-medium uppercase tracking-wider bg-white border border-[#E1EBF5] text-slate-700">
                           {p.category}
                         </span>
                         {isLow ? (
@@ -215,7 +217,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                       </div>
 
                       <div className="flex items-center justify-between mt-auto">
-                        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 shadow-2xs flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-white border border-[#E1EBF5] shadow-2xs flex items-center justify-center">
                           <ProductCategoryIcon category={p.category} />
                         </div>
                         <span className="text-xs font-semibold text-slate-700">
@@ -230,7 +232,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                         <span>{p.sku}</span>
                         <span className="font-medium text-amber-800 font-sans">{p.brand}</span>
                       </div>
-                      <h3 className="font-semibold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2">
+                      <h3 className="font-semibold text-[#002E6E] text-xs sm:text-sm leading-snug line-clamp-2">
                         {p.name}
                       </h3>
                       <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed font-normal">
@@ -243,7 +245,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                   <div className="p-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
                     <div>
                       <span className="text-[10px] text-slate-400 block font-normal">Central Base Rate</span>
-                      <span className="text-sm font-semibold text-slate-900">
+                      <span className="text-sm font-semibold text-[#002E6E]">
                         {formatIndianCurrency(p.price)}
                       </span>
                       <span className="text-[10px] text-slate-400 ml-0.5">/ {p.uom}</span>
@@ -258,7 +260,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                         <span>Edit Price</span>
                       </button>
                     ) : (
-                      <span className="text-[11px] px-2 py-0.5 bg-white text-slate-600 rounded border border-slate-200 font-normal">
+                      <span className="text-[11px] px-2 py-0.5 bg-white text-slate-600 rounded border border-[#E1EBF5] font-normal">
                         Verified
                       </span>
                     )}
@@ -269,11 +271,11 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
           </div>
         ) : (
           /* COMPACT TABLE VIEW */
-          <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="bg-white rounded-xl border border-[#E1EBF5] shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
+                  <tr className="bg-slate-50 border-b border-[#E1EBF5] text-slate-500 font-medium text-[11px] uppercase tracking-wider">
                     <th className="p-3">Equipment</th>
                     <th className="p-3">SKU &amp; Brand</th>
                     <th className="p-3">Category</th>
@@ -290,7 +292,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                       <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
                         <td className="p-3">
                           <div>
-                            <p className="font-semibold text-slate-900 text-xs">{p.name}</p>
+                            <p className="font-semibold text-[#002E6E] text-xs">{p.name}</p>
                             <p className="text-[11px] text-slate-500 line-clamp-1">{p.spec}</p>
                           </div>
                         </td>
@@ -304,7 +306,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                           </span>
                         </td>
                         <td className="p-3 text-right">
-                          <span className="text-sm font-semibold text-slate-900">
+                          <span className="text-sm font-semibold text-[#002E6E]">
                             {formatIndianCurrency(p.price)}
                           </span>
                           <span className="text-[10px] text-slate-400 block">/ {p.uom}</span>
@@ -344,10 +346,10 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
         )
       ) : (
         /* PRICE AUDIT HISTORY VIEW */
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <div className="bg-white rounded-xl border border-[#E1EBF5] shadow-xs overflow-hidden">
+          <div className="p-4 bg-slate-50 border-b border-[#E1EBF5] flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-xs text-slate-900 uppercase tracking-wider">
+              <h3 className="font-semibold text-xs text-[#002E6E] uppercase tracking-wider">
                 Historical Price Change Ledger
               </h3>
               <p className="text-[11px] text-slate-500">
@@ -362,7 +364,7 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-[#E1EBF5] text-slate-500 font-medium text-[11px] uppercase tracking-wider">
                   <th className="p-3">Timestamp</th>
                   <th className="p-3">Product Name</th>
                   <th className="p-3 text-right">Old Base Price</th>
@@ -386,11 +388,11 @@ export function ProductsView({ role, onOpenPriceModal }: ProductsViewProps) {
                           year: 'numeric',
                         })}
                       </td>
-                      <td className="p-3 font-medium text-slate-900">{ph.productName}</td>
+                      <td className="p-3 font-medium text-[#002E6E]">{ph.productName}</td>
                       <td className="p-3 text-right text-slate-500 line-through">
                         {formatIndianCurrency(ph.oldPrice)}
                       </td>
-                      <td className="p-3 text-right font-semibold text-slate-900">
+                      <td className="p-3 text-right font-semibold text-[#002E6E]">
                         {formatIndianCurrency(ph.newPrice)}
                       </td>
                       <td className="p-3 text-center">

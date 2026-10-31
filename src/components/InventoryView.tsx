@@ -1,5 +1,7 @@
 'use client';
 
+import { soundManager } from '@/lib/sound';
+
 import React, { useState } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Product, StockMovement, UserRole } from '@/types/crm';
@@ -38,7 +40,7 @@ function ProductCategoryBadge({ category }: { category: string }) {
       );
     case 'structure':
       return (
-        <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-lg bg-slate-100 border border-[#E1EBF5] text-slate-600 flex items-center justify-center shrink-0">
           <Layers className="w-4 h-4" />
         </div>
       );
@@ -75,13 +77,13 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E1EBF5]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
+          <div className="w-8 h-8 rounded-lg bg-[#E8F8FE] border border-[#BCE8FC] text-[#00BAF2] flex items-center justify-center font-medium">
             <Warehouse className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-semibold text-[#002E6E] tracking-tight">
               Warehouse &amp; Stock
             </h1>
             <p className="text-xs text-slate-500 font-normal">
@@ -92,7 +94,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
 
         <button
           onClick={() => onOpenStockModal()}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-xs cursor-pointer"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-xs transition-colors shadow-xs cursor-pointer"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Record Stock In / Out</span>
@@ -101,13 +103,13 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
 
       {/* Tabs & Search */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
-        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-slate-200/80">
+        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-[#E1EBF5]/80">
           <button
             onClick={() => setActiveTab('balance')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
               activeTab === 'balance'
-                ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#002E6E] shadow-2xs font-semibold'
+                : 'text-slate-600 hover:text-[#002E6E]'
             }`}
           >
             Live Stock Balances
@@ -116,8 +118,8 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
             onClick={() => setActiveTab('movements')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer ${
               activeTab === 'movements'
-                ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#002E6E] shadow-2xs font-semibold'
+                : 'text-slate-600 hover:text-[#002E6E]'
             }`}
           >
             Movement History ({movements.length})
@@ -131,7 +133,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search SKU, brand, model..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-[#E1EBF5] bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
           />
         </div>
       </div>
@@ -140,11 +142,11 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
       {activeTab === 'balance' ? (
         <>
           {/* Desktop Table View */}
-          <div className="hidden sm:block bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+          <div className="hidden sm:block bg-white rounded-xl border border-[#E1EBF5] shadow-xs overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
+                  <tr className="bg-slate-50 border-b border-[#E1EBF5] text-slate-500 font-medium text-[11px] uppercase tracking-wider">
                     <th className="p-3">SKU</th>
                     <th className="p-3">Product Name &amp; Spec</th>
                     <th className="p-3">Category</th>
@@ -168,7 +170,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                           <div className="flex items-center gap-2.5">
                             <ProductCategoryBadge category={p.category} />
                             <div>
-                              <p className="font-semibold text-slate-900 text-xs">{p.name}</p>
+                              <p className="font-semibold text-[#002E6E] text-xs">{p.name}</p>
                               <p className="text-[11px] text-slate-500 leading-normal">
                                 {p.brand} &bull; {p.spec}
                               </p>
@@ -181,7 +183,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                           </span>
                         </td>
                         <td className="p-3 text-center">
-                          <span className={`text-sm font-semibold ${isLow ? 'text-rose-600' : 'text-slate-900'}`}>
+                          <span className={`text-sm font-semibold ${isLow ? 'text-rose-600' : 'text-[#002E6E]'}`}>
                             {p.stock}
                           </span>{' '}
                           <span className="text-[11px] text-slate-400 font-normal">{p.uom}</span>
@@ -204,7 +206,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                         <td className="p-3 text-right">
                           <button
                             onClick={() => onOpenStockModal(p)}
-                            className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-amber-700 hover:text-white bg-amber-50 hover:bg-amber-500 rounded-lg transition-colors cursor-pointer"
+                            className="inline-flex items-center px-2.5 py-1 text-xs font-medium text-[#008AC5] hover:text-white bg-[#E8F8FE] hover:bg-[#00BAF2] border border-[#BCE8FC] rounded-lg transition-colors cursor-pointer"
                           >
                             Stock In/Out
                           </button>
@@ -226,12 +228,12 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                   : p.stock <= p.minStockAlert;
 
               return (
-                <div key={p.id} className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs space-y-2.5">
+                <div key={p.id} className="bg-white rounded-xl border border-[#E1EBF5] p-3.5 shadow-2xs space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
                       <ProductCategoryBadge category={p.category} />
                       <div>
-                        <h4 className="font-semibold text-xs text-slate-900 leading-tight">{p.name}</h4>
+                        <h4 className="font-semibold text-xs text-[#002E6E] leading-tight">{p.name}</h4>
                         <span className="text-[11px] font-mono text-slate-500">{p.sku}</span>
                       </div>
                     </div>
@@ -251,7 +253,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
                     <div>
                       <span className="text-slate-400 text-[10px] block">Available</span>
-                      <span className={`text-base font-semibold ${isLow ? 'text-rose-600' : 'text-slate-900'}`}>
+                      <span className={`text-base font-semibold ${isLow ? 'text-rose-600' : 'text-[#002E6E]'}`}>
                         {p.stock} <span className="text-xs font-normal text-slate-500">{p.uom}</span>
                       </span>
                     </div>
@@ -270,11 +272,11 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
         </>
       ) : (
         /* STOCK MOVEMENTS TABLE */
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#E1EBF5] shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
+                <tr className="bg-slate-50 border-b border-[#E1EBF5] text-slate-500 font-medium text-[11px] uppercase tracking-wider">
                   <th className="p-3">Movement #</th>
                   <th className="p-3">Date &amp; Time</th>
                   <th className="p-3">Product Name</th>
@@ -299,7 +301,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="p-3 font-medium text-slate-900">{m.productName}</td>
+                      <td className="p-3 font-medium text-[#002E6E]">{m.productName}</td>
                       <td className="p-3">
                         <span
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border ${
@@ -312,7 +314,7 @@ export function InventoryView({ role, onOpenStockModal }: InventoryViewProps) {
                           <span className="uppercase">{m.type}</span>
                         </span>
                       </td>
-                      <td className="p-3 text-center font-semibold text-slate-900">
+                      <td className="p-3 text-center font-semibold text-[#002E6E]">
                         {isIn ? '+' : '-'}
                         {m.quantity}
                       </td>

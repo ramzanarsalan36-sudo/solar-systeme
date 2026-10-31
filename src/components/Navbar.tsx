@@ -5,6 +5,7 @@ import { User, UserRole } from '@/types/crm';
 import { crmStorage } from '@/lib/storage';
 import { INITIAL_USERS } from '@/lib/initial-data';
 import { RoleBadge } from './RoleBadge';
+import { soundManager } from '@/lib/sound';
 import {
   Sun,
   Bell,
@@ -23,6 +24,8 @@ import {
   Warehouse,
   Wrench,
   Boxes,
+  Volume2,
+  VolumeX,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -52,9 +55,12 @@ export function Navbar({
   const [searchFocused, setSearchFocused] = useState(false);
   const [dueFollowUps, setDueFollowUps] = useState<number>(0);
   const [lowStockCount, setLowStockCount] = useState<number>(0);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setSoundEnabled(soundManager.isEnabled());
+
     function refreshAlerts() {
       const followups = crmStorage.getFollowUps().filter((f) => !f.isDone);
       const today = new Date().toISOString().split('T')[0];
@@ -71,6 +77,15 @@ export function Navbar({
     return () => window.removeEventListener('systomech_crm_storage_change', refreshAlerts);
   }, []);
 
+  const handleToggleSound = () => {
+    const newState = !soundEnabled;
+    soundManager.setEnabled(newState);
+    setSoundEnabled(newState);
+    if (newState) {
+      soundManager.playPaytmChime();
+    }
+  };
+
   // Close search dropdown on click outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -82,74 +97,88 @@ export function Navbar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const totalAlerts = dueFollowUps + (currentUser.role !== 'sales' ? lowStockCount : 0);
-
-  // Global search matching
+  // Quick Autocomplete items
   const matchingLeads = searchQuery.trim()
-    ? crmStorage.getLeads().filter((l) =>
-        l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.phone.includes(searchQuery) ||
-        l.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        l.leadNumber.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 3)
+    ? crmStorage
+        .getLeads()
+        .filter(
+          (l) =>
+            l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            l.phone.includes(searchQuery) ||
+            l.city.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, 3)
     : [];
 
   const matchingQuotes = searchQuery.trim()
-    ? crmStorage.getQuotations().filter((q) =>
-        q.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.quoteNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.city.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 3)
+    ? crmStorage
+        .getQuotations()
+        .filter(
+          (q) =>
+            q.quoteNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            q.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, 3)
     : [];
 
   const matchingProducts = searchQuery.trim()
-    ? crmStorage.getProducts().filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.brand.toLowerCase().includes(searchQuery.toLowerCase())
-      ).slice(0, 3)
+    ? crmStorage
+        .getProducts()
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            p.sku.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        .slice(0, 3)
     : [];
 
   const totalResults = matchingLeads.length + matchingQuotes.length + matchingProducts.length;
+  const totalAlerts = dueFollowUps + (currentUser.role !== 'sales' ? lowStockCount : 0);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-200/90 shadow-xs no-print text-slate-800 transition-all">
-      <div className="w-full px-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 bg-[#002E6E] text-white shadow-md border-b border-[#002354] no-print">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
-          {/* Brand & Mobile Hamburger */}
+          {/* Left Brand Identity */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              onClick={() => {
+                soundManager.playSoftClick();
+                setMobileMenuOpen(!mobileMenuOpen);
+              }}
+              className="md:hidden p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
             <div
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => {
+                soundManager.playSoftClick();
+                setActiveTab('dashboard');
+              }}
               className="flex items-center gap-2.5 cursor-pointer group select-none"
             >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-xs text-white">
-                <Sun className="w-5 h-5 stroke-[2.2]" />
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#00BAF2] flex items-center justify-center shadow-md text-white font-bold">
+                <Sun className="w-5 h-5 stroke-[2.4]" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold tracking-tight text-sm sm:text-base text-slate-900">
+                  <span className="font-bold tracking-tight text-sm sm:text-base text-white">
                     Systomech
                   </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-md font-medium bg-amber-50 text-amber-800 border border-amber-200/80">
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-[#00BAF2] text-white">
                     Solar CRM
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 hidden sm:block font-normal">
-                  Rooftop EPC &bull; PM Surya Ghar
+                <p className="text-[10px] text-white/60 hidden sm:block font-normal">
+                  PM Surya Ghar &bull; Maharashtra EPC
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Unified Global Search Bar (Responsive & Clean) */}
+          {/* Unified Global Search Bar (Paytm Crisp White Input) */}
           <div ref={searchContainerRef} className="relative flex-1 max-w-xs sm:max-w-md hidden sm:block">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
@@ -158,8 +187,8 @@ export function Navbar({
                 value={searchQuery}
                 onFocus={() => setSearchFocused(true)}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search leads, quotes, products..."
-                className="w-full pl-9 pr-8 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-slate-50/70 focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-all"
+                placeholder="Search leads, quotes, inventory..."
+                className="w-full pl-9 pr-8 py-1.5 text-xs sm:text-sm rounded-xl border border-transparent bg-white focus:border-[#00BAF2] focus:ring-2 focus:ring-[#00BAF2]/30 focus:outline-hidden text-[#0F1E36] placeholder:text-slate-400 shadow-xs transition-all"
               />
               {searchQuery && (
                 <button
@@ -173,7 +202,7 @@ export function Navbar({
 
             {/* Quick Search Autocomplete Results Dropdown */}
             {searchFocused && searchQuery.trim() && (
-              <div className="absolute left-0 right-0 mt-1.5 bg-white rounded-xl shadow-lg border border-slate-200 text-xs py-2 z-50 max-h-80 overflow-y-auto">
+              <div className="absolute left-0 right-0 mt-1.5 bg-white rounded-2xl shadow-xl border border-[#E1EBF5] text-xs py-2 z-50 max-h-80 overflow-y-auto text-[#0F1E36]">
                 {totalResults === 0 ? (
                   <div className="p-3 text-center text-slate-500">
                     No results found for &ldquo;{searchQuery}&rdquo;
@@ -182,60 +211,63 @@ export function Navbar({
                   <>
                     {matchingLeads.length > 0 && (
                       <div className="px-3 py-1">
-                        <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider mb-1">
+                        <div className="text-[10px] uppercase font-semibold text-[#00BAF2] tracking-wider mb-1">
                           Leads
                         </div>
                         {matchingLeads.map((l) => (
                           <div
                             key={l.id}
                             onClick={() => {
+                              soundManager.playSoftClick();
                               setActiveTab('leads');
                               setSearchFocused(false);
                             }}
-                            className="p-2 hover:bg-slate-50 rounded-lg cursor-pointer flex items-center justify-between"
+                            className="p-2 hover:bg-[#F4F7FC] rounded-lg cursor-pointer flex items-center justify-between"
                           >
-                            <span className="font-medium text-slate-900">{l.name}</span>
-                            <span className="text-[11px] text-slate-500">{l.phone} &bull; {l.city}</span>
+                            <span className="font-medium text-[#0F1E36]">{l.name}</span>
+                            <span className="text-[11px] text-[#5B6E88]">{l.phone} &bull; {l.city}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     {matchingQuotes.length > 0 && (
-                      <div className="px-3 py-1 border-t border-slate-100">
-                        <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider mb-1">
+                      <div className="px-3 py-1 border-t border-[#E1EBF5]">
+                        <div className="text-[10px] uppercase font-semibold text-[#00BAF2] tracking-wider mb-1">
                           Quotations
                         </div>
                         {matchingQuotes.map((q) => (
                           <div
                             key={q.id}
                             onClick={() => {
+                              soundManager.playSoftClick();
                               setActiveTab('quotations');
                               setSearchFocused(false);
                             }}
-                            className="p-2 hover:bg-slate-50 rounded-lg cursor-pointer flex items-center justify-between"
+                            className="p-2 hover:bg-[#F4F7FC] rounded-lg cursor-pointer flex items-center justify-between"
                           >
-                            <span className="font-medium text-slate-900">{q.customerName} ({q.systemKw} kW)</span>
-                            <span className="text-[11px] text-slate-500">{q.quoteNumber}</span>
+                            <span className="font-medium text-[#0F1E36]">{q.customerName} ({q.systemKw} kW)</span>
+                            <span className="text-[11px] text-[#5B6E88]">{q.quoteNumber}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     {matchingProducts.length > 0 && (
-                      <div className="px-3 py-1 border-t border-slate-100">
-                        <div className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider mb-1">
+                      <div className="px-3 py-1 border-t border-[#E1EBF5]">
+                        <div className="text-[10px] uppercase font-semibold text-[#00BAF2] tracking-wider mb-1">
                           Products
                         </div>
                         {matchingProducts.map((p) => (
                           <div
                             key={p.id}
                             onClick={() => {
+                              soundManager.playSoftClick();
                               setActiveTab('inventory');
                               setSearchFocused(false);
                             }}
-                            className="p-2 hover:bg-slate-50 rounded-lg cursor-pointer flex items-center justify-between"
+                            className="p-2 hover:bg-[#F4F7FC] rounded-lg cursor-pointer flex items-center justify-between"
                           >
-                            <span className="font-medium text-slate-900">{p.name}</span>
-                            <span className="text-[11px] text-slate-500">{p.stock} in stock</span>
+                            <span className="font-medium text-[#0F1E36]">{p.name}</span>
+                            <span className="text-[11px] text-[#5B6E88]">{p.stock} in stock</span>
                           </div>
                         ))}
                       </div>
@@ -247,8 +279,8 @@ export function Navbar({
           </div>
 
           {/* Role Switcher Pill */}
-          <div className="hidden lg:flex items-center gap-1 p-1 bg-slate-100/80 border border-slate-200/80 rounded-xl">
-            <span className="text-[11px] font-medium text-slate-500 px-2">Role:</span>
+          <div className="hidden lg:flex items-center gap-1 p-1 bg-white/10 border border-white/15 rounded-xl">
+            <span className="text-[11px] font-medium text-white/70 px-2">Role:</span>
             {[
               { role: 'admin', label: 'Admin', user: INITIAL_USERS[0] },
               { role: 'sales', label: 'Sales / Office', user: INITIAL_USERS[1] },
@@ -259,11 +291,14 @@ export function Navbar({
                 <button
                   key={r.role}
                   type="button"
-                  onClick={() => onUserChange(r.user)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  onClick={() => {
+                    soundManager.playSoftClick();
+                    onUserChange(r.user);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isCurrent
-                      ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                      ? 'bg-white text-[#002E6E] shadow-xs'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   {r.label}
@@ -272,24 +307,47 @@ export function Navbar({
             })}
           </div>
 
-          {/* Quick Actions & Profile */}
+          {/* Quick Actions, Sound & Profile */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Quick action buttons */}
+            {/* Paytm Sound Chime Toggle Button */}
+            <button
+              onClick={handleToggleSound}
+              className={`p-2 rounded-xl transition-all cursor-pointer flex items-center gap-1 ${
+                soundEnabled
+                  ? 'bg-[#00BAF2]/20 text-[#00BAF2] hover:bg-[#00BAF2]/30 border border-[#00BAF2]/40'
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
+              }`}
+              title={soundEnabled ? 'Paytm Sound FX On (Click to Mute)' : 'Paytm Sound FX Muted (Click to Enable)'}
+              aria-label="Toggle Sound"
+            >
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-[#00BAF2]" /> : <VolumeX className="w-4 h-4" />}
+              <span className="text-[10px] font-semibold hidden xl:inline">
+                {soundEnabled ? 'Sound' : 'Muted'}
+              </span>
+            </button>
+
+            {/* Quick action buttons (Paytm Cyan & White) */}
             {currentUser.role !== 'store_field' && (
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
-                  onClick={onOpenQuoteModal}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
+                  onClick={() => {
+                    soundManager.playSoftClick();
+                    onOpenQuoteModal();
+                  }}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 shadow-xs transition-colors cursor-pointer"
                 >
-                  <Calculator className="w-3.5 h-3.5" />
+                  <Calculator className="w-3.5 h-3.5 text-[#00BAF2]" />
                   <span>Solar Quote</span>
                 </button>
 
                 <button
-                  onClick={onOpenLeadModal}
-                  className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-white shadow-xs transition-colors cursor-pointer"
+                  onClick={() => {
+                    soundManager.playSoftClick();
+                    onOpenLeadModal();
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-xs transition-all cursor-pointer active:scale-95"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <PlusCircle className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">New Lead</span>
                   <span className="sm:hidden">Lead</span>
                 </button>
@@ -299,43 +357,47 @@ export function Navbar({
             {/* Notification Bell */}
             <div className="relative">
               <button
-                onClick={() => setNotificationOpen(!notificationOpen)}
-                className="relative p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                onClick={() => {
+                  soundManager.playSoftClick();
+                  setNotificationOpen(!notificationOpen);
+                }}
+                className="relative p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 title="Notifications"
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
                 {totalAlerts > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">
+                  <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-[#FFA400] text-[#002E6E] text-[9px] font-bold flex items-center justify-center">
                     {totalAlerts}
                   </span>
                 )}
               </button>
 
               {notificationOpen && (
-                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl shadow-xl border border-slate-200 text-slate-800 p-3 z-50">
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-                    <span className="font-semibold text-xs text-slate-900">
-                      Notifications
+                <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-[#E1EBF5] text-[#0F1E36] p-3 z-50">
+                  <div className="flex items-center justify-between pb-2 border-b border-[#E1EBF5]">
+                    <span className="font-semibold text-xs text-[#002E6E]">
+                      Live Notifications
                     </span>
-                    <span className="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
-                      Live
+                    <span className="text-[10px] font-semibold text-[#008A3F] bg-[#E7F9F0] px-2 py-0.5 rounded-full">
+                      Paytm Live
                     </span>
                   </div>
-                  <div className="divide-y divide-slate-100 max-h-60 overflow-y-auto mt-1">
+                  <div className="divide-y divide-[#E1EBF5] max-h-60 overflow-y-auto mt-1">
                     {dueFollowUps > 0 && (
                       <div
                         onClick={() => {
+                          soundManager.playSoftClick();
                           setActiveTab('leads');
                           setNotificationOpen(false);
                         }}
-                        className="py-2.5 px-1 hover:bg-slate-50 rounded-lg cursor-pointer"
+                        className="py-2.5 px-1 hover:bg-[#F4F7FC] rounded-lg cursor-pointer"
                       >
                         <p className="text-xs font-medium text-amber-900 flex items-center gap-1.5">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                          <AlertTriangle className="w-3.5 h-3.5 text-[#FFA400] shrink-0" />
                           <span>{dueFollowUps} Follow-up{dueFollowUps > 1 ? 's' : ''} Due Today</span>
                         </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
+                        <p className="text-[11px] text-[#5B6E88] mt-0.5">
                           Customer phone consultation scheduled.
                         </p>
                       </div>
@@ -343,23 +405,19 @@ export function Navbar({
                     {lowStockCount > 0 && currentUser.role !== 'sales' && (
                       <div
                         onClick={() => {
+                          soundManager.playSoftClick();
                           setActiveTab('inventory');
                           setNotificationOpen(false);
                         }}
-                        className="py-2.5 px-1 hover:bg-slate-50 rounded-lg cursor-pointer"
+                        className="py-2.5 px-1 hover:bg-[#F4F7FC] rounded-lg cursor-pointer"
                       >
                         <p className="text-xs font-medium text-rose-900 flex items-center gap-1.5">
                           <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-                          <span>{lowStockCount} Product{lowStockCount > 1 ? 's' : ''} Below Minimum</span>
+                          <span>{lowStockCount} Products Below Min Stock</span>
                         </p>
-                        <p className="text-[11px] text-slate-500 mt-0.5">
-                          Panels/Inverters below safe threshold.
+                        <p className="text-[11px] text-[#5B6E88] mt-0.5">
+                          Inventory reorder needed for panels / inverters.
                         </p>
-                      </div>
-                    )}
-                    {totalAlerts === 0 && (
-                      <div className="py-4 text-center text-xs text-slate-500">
-                        All operations are up to date!
                       </div>
                     )}
                   </div>
@@ -367,60 +425,75 @@ export function Navbar({
               )}
             </div>
 
-            {/* Profile Dropdown */}
+            {/* User Profile */}
             <div className="relative">
               <button
                 onClick={() => setRoleDropdownOpen(!roleDropdownOpen)}
-                className="flex items-center gap-1.5 p-1 sm:px-2 sm:py-1 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors cursor-pointer"
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-white/10 transition-colors text-left cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-lg bg-slate-900 text-amber-400 font-semibold text-xs flex items-center justify-center">
-                  {currentUser.name.charAt(0)}
+                <div className="w-8 h-8 rounded-full bg-[#00BAF2] text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                  {currentUser.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .slice(0, 2)}
                 </div>
-                <div className="hidden sm:block text-left">
-                  <div className="text-xs font-medium text-slate-900 leading-tight">{currentUser.name}</div>
-                  <div className="text-[10px] text-slate-500 capitalize">{currentUser.role.replace('_', ' ')}</div>
+                <div className="hidden xl:block">
+                  <div className="text-xs font-semibold text-white leading-tight">
+                    {currentUser.name}
+                  </div>
+                  <div className="text-[10px] text-white/70 capitalize">
+                    {currentUser.role.replace('_', ' ')}
+                  </div>
                 </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-white/60 hidden xl:block" />
               </button>
 
               {roleDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-200 text-slate-800 p-2 z-50">
-                  <div className="px-2.5 py-1.5 border-b border-slate-100">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                      Switch Role Mode
-                    </p>
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#E1EBF5] text-[#0F1E36] p-2 z-50">
+                  <div className="p-2 border-b border-[#E1EBF5]">
+                    <p className="text-xs font-semibold text-[#002E6E]">{currentUser.name}</p>
+                    <p className="text-[11px] text-[#5B6E88]">{currentUser.email}</p>
+                    <div className="mt-1.5">
+                      <RoleBadge role={currentUser.role} size="sm" />
+                    </div>
                   </div>
+
                   <div className="py-1">
+                    <span className="block px-2 py-1 text-[10px] uppercase font-semibold text-slate-400 tracking-wider">
+                      Switch Role Profile
+                    </span>
                     {INITIAL_USERS.map((u) => (
                       <button
                         key={u.id}
                         onClick={() => {
+                          soundManager.playPaytmChime();
                           onUserChange(u);
                           setRoleDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-2.5 py-2 rounded-lg flex items-center justify-between text-xs transition-colors cursor-pointer ${
-                          u.id === currentUser.id ? 'bg-amber-50 text-amber-950 font-semibold' : 'hover:bg-slate-50 text-slate-700'
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center justify-between cursor-pointer ${
+                          currentUser.id === u.id ? 'bg-[#E8F8FE] text-[#002E6E] font-semibold' : 'hover:bg-[#F4F7FC] text-[#5B6E88]'
                         }`}
                       >
-                        <div>
-                          <div className="font-medium text-slate-900">{u.name}</div>
-                          <div className="text-[10px] text-slate-500">{u.role.replace('_', ' ')}</div>
-                        </div>
-                        <RoleBadge role={u.role} size="sm" />
+                        <span>{u.name}</span>
+                        <span className="text-[10px] uppercase font-mono text-[#8C9EB5]">{u.role}</span>
                       </button>
                     ))}
                   </div>
-                  <div className="pt-1.5 border-t border-slate-100 px-2">
+
+                  <div className="pt-1 border-t border-[#E1EBF5]">
                     <button
                       onClick={() => {
-                        if (confirm('Reset CRM database to fresh default state?')) {
+                        if (confirm('Reset all CRM data to initial demonstration state?')) {
                           crmStorage.resetAllData();
+                          soundManager.playPaytmChime();
+                          window.location.reload();
                         }
                       }}
-                      className="text-[11px] text-slate-500 hover:text-rose-600 flex items-center gap-1.5 py-1 transition-colors cursor-pointer"
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-1.5 cursor-pointer font-medium"
                     >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>Reset Demo Database</span>
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Reset Demo Data</span>
                     </button>
                   </div>
                 </div>

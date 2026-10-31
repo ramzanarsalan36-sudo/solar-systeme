@@ -1,5 +1,7 @@
 'use client';
 
+import { soundManager } from '@/lib/sound';
+
 import React, { useState } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { AuditLog, UserRole } from '@/types/crm';
@@ -26,7 +28,7 @@ export function AuditView({ role }: AuditViewProps) {
 
   if (role !== 'admin') {
     return (
-      <div className="p-8 text-center bg-white rounded-xl border border-slate-200">
+      <div className="p-8 text-center bg-white rounded-xl border border-[#E1EBF5]">
         <Lock className="w-8 h-8 text-rose-500 mx-auto mb-2" />
         <h3 className="font-semibold text-slate-800">Restricted Admin Access</h3>
         <p className="text-xs text-slate-500 mt-1">
@@ -39,13 +41,13 @@ export function AuditView({ role }: AuditViewProps) {
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E1EBF5]">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-600 flex items-center justify-center font-medium">
             <ShieldAlert className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
+            <h1 className="text-lg sm:text-xl font-semibold text-[#002E6E] tracking-tight">
               Security &amp; Audit Logs
             </h1>
             <p className="text-xs text-slate-500 font-normal">
@@ -64,19 +66,19 @@ export function AuditView({ role }: AuditViewProps) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search audit details, actor, or action..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
+            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-[#E1EBF5] bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-slate-200/80 overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-[#E1EBF5]/80 overflow-x-auto">
           {['all', 'product', 'lead', 'quotation', 'order', 'inventory', 'payment', 'settings'].map((et) => (
             <button
               key={et}
               onClick={() => setEntityFilter(et)}
               className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize shrink-0 transition-all cursor-pointer ${
                 entityFilter === et
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white text-[#002E6E] shadow-2xs font-semibold'
+                  : 'text-slate-600 hover:text-[#002E6E]'
               }`}
             >
               {et}
@@ -86,11 +88,11 @@ export function AuditView({ role }: AuditViewProps) {
       </div>
 
       {/* Audit Log Table */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-[#E1EBF5] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-[#E1EBF5] text-slate-500 font-medium text-[11px] uppercase tracking-wider">
                 <th className="p-3">Timestamp</th>
                 <th className="p-3">Actor &amp; Role</th>
                 <th className="p-3">Action Event</th>
@@ -112,7 +114,7 @@ export function AuditView({ role }: AuditViewProps) {
                   </td>
 
                   <td className="p-3 align-top">
-                    <p className="font-semibold text-slate-900">{log.actorName}</p>
+                    <p className="font-semibold text-[#002E6E]">{log.actorName}</p>
                     <span className="text-[10px] text-slate-400 capitalize">{log.actorRole.replace('_', ' ')}</span>
                   </td>
 

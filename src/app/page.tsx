@@ -248,8 +248,12 @@ export default function SolarCrmApp() {
       />
 
       <QuotationViewModal
+        isOpen={quoteViewModalOpen}
         quote={activeQuoteToView}
-        onClose={() => setQuoteViewModalOpen(false)}
+        onClose={() => {
+          setQuoteViewModalOpen(false);
+          setActiveQuoteToView(null);
+        }}
         userRole={currentUser.role}
         onOrderCreated={() => {
           setActiveTab('orders');

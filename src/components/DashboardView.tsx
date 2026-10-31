@@ -90,14 +90,14 @@ export function DashboardView({
   return (
     <div className="space-y-5">
       {/* Hero Solar EPC Operations Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-5 sm:p-7 text-white shadow-md border border-slate-700/80">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-transparent rounded-full blur-2xl pointer-events-none" />
+      <div className="relative overflow-hidden bg-gradient-to-br from-[#002E6E] via-[#003B8D] to-[#002354] rounded-2xl p-5 sm:p-7 text-white shadow-md border border-[#002354] shadow-lg">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-[#00BAF2]/30 via-cyan-400/15 to-transparent rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
           <div className="space-y-2 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md font-medium bg-amber-500 text-slate-950 shadow-2xs">
-                <Sun className="w-3.5 h-3.5 fill-slate-950" />
+              <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md font-medium bg-[#00BAF2] text-white shadow-2xs">
+                <Sun className="w-3.5 h-3.5 fill-white" />
                 Systomech Engineers &bull; Solar EPC
               </span>
               <span className="text-xs text-slate-300 bg-white/10 px-2.5 py-0.5 rounded-md border border-white/10">
@@ -127,7 +127,7 @@ export function DashboardView({
               <>
                 <button
                   onClick={onOpenQuoteModal}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-md shadow-xs transition-colors cursor-pointer"
                 >
                   <Calculator className="w-4 h-4" />
                   <span>Bill to Solar Quote</span>
@@ -136,14 +136,14 @@ export function DashboardView({
                   onClick={onOpenLeadModal}
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-colors cursor-pointer"
                 >
-                  <PlusCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <PlusCircle className="w-3.5 h-3.5 text-[#FFA400]" />
                   <span>New Lead</span>
                 </button>
               </>
             ) : (
               <button
                 onClick={onOpenStockModal}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white shadow-xs transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-md shadow-xs transition-colors cursor-pointer"
               >
                 <Warehouse className="w-4 h-4 stroke-[2.5]" />
                 <span>Record Stock GRN / Dispatch</span>
@@ -157,22 +157,22 @@ export function DashboardView({
           <div>
             <span className="text-[10px] text-slate-400 block uppercase font-medium">Pipeline Proposals</span>
             <span className="text-base font-semibold text-white">{quotations.length} Active</span>
-            <span className="block text-[11px] text-amber-300 font-medium">{formatIndianCurrency(totalPipelineValue)}</span>
+            <span className="block text-[11px] text-[#00BAF2] font-medium">{formatIndianCurrency(totalPipelineValue)}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block uppercase font-medium">Under Execution</span>
             <span className="text-base font-semibold text-white">{orders.length} Rooftop Sites</span>
-            <span className="block text-[11px] text-emerald-300 font-medium">{formatIndianCurrency(totalOrderValue)}</span>
+            <span className="block text-[11px] text-[#00AC4F] font-medium">{formatIndianCurrency(totalOrderValue)}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block uppercase font-medium">Govt Subsidy DBT</span>
-            <span className="text-base font-semibold text-amber-400">PM Surya Ghar</span>
+            <span className="text-base font-semibold text-[#FFA400]">PM Surya Ghar</span>
             <span className="block text-[11px] text-slate-300">Up to ₹78,000 / consumer</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 block uppercase font-medium">Operating Discoms</span>
             <span className="text-base font-semibold text-white">MSEDCL, Tata Power</span>
-            <span className="block text-[11px] text-emerald-300 font-medium">Net-metering synchronized</span>
+            <span className="block text-[11px] text-[#00AC4F] font-medium">Net-metering synchronized</span>
           </div>
         </div>
       </div>
@@ -182,14 +182,14 @@ export function DashboardView({
         {/* Card 1: Leads */}
         <div
           onClick={() => setActiveTab(role === 'store_field' ? 'tasks' : 'leads')}
-          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+          className="bg-white p-4 sm:p-5 rounded-xl border border-[#E1EBF5] shadow-2xs hover:border-[#00BAF2] hover:shadow-xs transition-all cursor-pointer group"
         >
           <div className="h-1 w-full bg-gradient-to-r from-blue-500 to-indigo-600 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Field Site Tasks' : 'Active Inquiries'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center transition-transform shadow-2xs">
+            <div className="w-8 h-8 rounded-lg bg-[#E8F8FE] text-[#00BAF2] flex items-center justify-center transition-transform shadow-2xs">
               {role === 'store_field' ? <Wrench className="w-4 h-4" /> : <Users className="w-4 h-4" />}
             </div>
           </div>
@@ -209,14 +209,14 @@ export function DashboardView({
         {/* Card 2: Quotations / Stock SKUs */}
         <div
           onClick={() => setActiveTab(role === 'store_field' ? 'inventory' : 'quotations')}
-          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+          className="bg-white p-4 sm:p-5 rounded-xl border border-[#E1EBF5] shadow-2xs hover:border-[#00BAF2] hover:shadow-xs transition-all cursor-pointer group"
         >
           <div className="h-1 w-full bg-gradient-to-r from-amber-400 to-orange-500 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Master Hardware' : 'Quotations Pipeline'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center transition-transform shadow-2xs">
+            <div className="w-8 h-8 rounded-lg bg-[#FFF8EA] text-[#FFA400] flex items-center justify-center transition-transform shadow-2xs">
               {role === 'store_field' ? <Warehouse className="w-4 h-4" /> : <FileSpreadsheet className="w-4 h-4" />}
             </div>
           </div>
@@ -236,14 +236,14 @@ export function DashboardView({
         {/* Card 3: Orders & Collections */}
         <div
           onClick={() => setActiveTab('orders')}
-          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+          className="bg-white p-4 sm:p-5 rounded-xl border border-[#E1EBF5] shadow-2xs hover:border-[#00BAF2] hover:shadow-xs transition-all cursor-pointer group"
         >
           <div className="h-1 w-full bg-gradient-to-r from-emerald-500 to-teal-600 absolute top-0 left-0" />
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">
               {role === 'store_field' ? 'Live Plants' : 'Projects Booked'}
             </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center transition-transform shadow-2xs">
+            <div className="w-8 h-8 rounded-lg bg-[#E7F9F0] text-[#00AC4F] flex items-center justify-center transition-transform shadow-2xs">
               <PackageCheck className="w-4 h-4" />
             </div>
           </div>
@@ -261,7 +261,7 @@ export function DashboardView({
         {/* Card 4: Action Alerts */}
         <div
           onClick={() => setActiveTab(role === 'sales' ? 'leads' : 'inventory')}
-          className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all cursor-pointer group"
+          className="bg-white p-4 sm:p-5 rounded-xl border border-[#E1EBF5] shadow-2xs hover:border-[#00BAF2] hover:shadow-xs transition-all cursor-pointer group"
         >
           <div className={`h-1 w-full absolute top-0 left-0 ${
             (role === 'sales' ? dueTodayFollowups.length : lowStockProducts.length) > 0
@@ -276,7 +276,7 @@ export function DashboardView({
               className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform shadow-2xs ${
                 (role === 'sales' ? dueTodayFollowups.length : lowStockProducts.length) > 0
                   ? 'bg-rose-50 text-rose-600'
-                  : 'bg-emerald-50 text-emerald-600'
+                  : 'bg-[#E7F9F0] text-[#00AC4F]'
               }`}
             >
               <AlertTriangle className="w-4 h-4" />
@@ -329,7 +329,7 @@ export function DashboardView({
 
             <button
               onClick={onOpenQuoteModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-md transition-colors cursor-pointer"
             >
               <span>Full Proposal Modal</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ export function DashboardView({
                     max="50000"
                     value={quickBill}
                     onChange={(e) => setQuickBill(Number(e.target.value))}
-                    className="w-24 px-2 py-1 text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg text-right focus:border-amber-500 focus:outline-hidden"
+                    className="w-24 px-2 py-1 text-sm font-semibold text-slate-900 bg-slate-50 border border-slate-200 rounded-lg text-right focus:border-[#00BAF2] focus:outline-hidden"
                   />
                   <span className="text-xs text-slate-500 font-medium">/mo</span>
                 </div>
@@ -408,7 +408,7 @@ export function DashboardView({
               </div>
 
               <div className="p-3 bg-slate-900 rounded-xl text-white flex flex-col justify-between shadow-2xs">
-                <span className="text-[10px] font-medium text-amber-400 uppercase">Net Customer Payable</span>
+                <span className="text-[10px] font-medium text-[#FFA400] uppercase">Net Customer Payable</span>
                 <span className="text-base sm:text-lg font-bold text-white my-1">
                   {formatIndianCurrency(quickCalc.netPayableCustomer)}
                 </span>
@@ -542,7 +542,7 @@ export function DashboardView({
 
             <button
               onClick={onOpenStockModal}
-              className="w-full py-2 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2 text-xs font-semibold text-white bg-[#00BAF2] hover:bg-[#00A6DA] rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <Warehouse className="w-3.5 h-3.5" />
               <span>Record Stock In / Out</span>
@@ -684,7 +684,7 @@ export function DashboardView({
                 <div
                   key={o.id}
                   onClick={() => setActiveTab('orders')}
-                  className="p-2.5 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors cursor-pointer flex items-center justify-between"
+                  className="p-2.5 bg-white rounded-lg border border-slate-200 hover:border-[#00BAF2] transition-colors cursor-pointer flex items-center justify-between"
                 >
                   <div>
                     <div className="font-medium text-slate-900">{o.customerName} ({o.systemKw}kW)</div>

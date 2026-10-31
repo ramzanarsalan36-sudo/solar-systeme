@@ -5,6 +5,7 @@ import { crmStorage } from '@/lib/storage';
 import { Quotation, UserRole } from '@/types/crm';
 import { formatIndianCurrency } from '@/lib/solar-calc';
 import { generateWhatsAppMessage } from '@/lib/pdf-generator';
+import { soundManager } from '@/lib/sound';
 import {
   FileSpreadsheet,
   Search,
@@ -12,6 +13,8 @@ import {
   Eye,
   Share2,
   RotateCw,
+  Sun,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface QuotationsViewProps {
@@ -39,28 +42,31 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
   return (
     <div className="space-y-4 sm:space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#E1EBF5]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
-            <FileSpreadsheet className="w-4 h-4" />
+          <div className="w-9 h-9 rounded-xl bg-[#E8F8FE] border border-[#BCE8FC] text-[#00BAF2] flex items-center justify-center font-bold shadow-xs">
+            <FileSpreadsheet className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
-              Quotations &amp; Proposals
+            <h1 className="text-lg sm:text-xl font-bold text-[#002E6E] tracking-tight">
+              Quotations &amp; Proposals Hub
             </h1>
-            <p className="text-xs text-slate-500 font-normal">
-              Official price quotes &bull; PM Surya Ghar Subsidy breakdown &bull; WhatsApp sharing
+            <p className="text-xs text-[#5B6E88] font-normal">
+              Formal A4 solar proposals &bull; PM Surya Ghar DBT calculation &bull; WhatsApp delivery
             </p>
           </div>
         </div>
 
         {role !== 'store_field' && (
           <button
-            onClick={onOpenQuoteModal}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-xs cursor-pointer"
+            onClick={() => {
+              soundManager.playSoftClick();
+              onOpenQuoteModal();
+            }}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-[#00BAF2] hover:bg-[#00A6DA] text-white shadow-xs transition-all cursor-pointer active:scale-95"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>New Solar Quote</span>
+            <span>Generate New Solar Quote</span>
           </button>
         )}
       </div>
@@ -73,20 +79,23 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by quote ref, customer, phone..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
+            placeholder="Search quote ref, customer, phone..."
+            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-xl border border-[#E1EBF5] bg-white focus:border-[#00BAF2] focus:ring-2 focus:ring-[#00BAF2]/20 focus:outline-hidden text-[#0F1E36] placeholder:text-slate-400 shadow-2xs transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-slate-200/80 overflow-x-auto">
+        <div className="flex items-center gap-1.5 p-1 bg-[#F4F7FC] rounded-xl border border-[#E1EBF5] overflow-x-auto">
           {['all', 'draft', 'shared', 'accepted', 'revised'].map((st) => (
             <button
               key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize shrink-0 transition-all cursor-pointer ${
+              onClick={() => {
+                soundManager.playSoftClick();
+                setStatusFilter(st);
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold capitalize shrink-0 transition-all cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#002E6E] text-white shadow-xs'
+                  : 'text-[#5B6E88] hover:text-[#002E6E] hover:bg-white/60'
               }`}
             >
               {st}
@@ -96,68 +105,68 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
       </div>
 
       {/* Desktop Quotations Table */}
-      <div className="hidden sm:block bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="hidden sm:block bg-white rounded-2xl border border-[#E1EBF5] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium text-[11px] uppercase tracking-wider">
-                <th className="p-3">Quote Ref</th>
-                <th className="p-3">Customer &amp; Site</th>
-                <th className="p-3">System Sizing</th>
-                <th className="p-3 text-right">Gross Total</th>
-                <th className="p-3 text-right">Subsidy</th>
-                <th className="p-3 text-right">Net Payable</th>
-                <th className="p-3">Status</th>
-                <th className="p-3 text-right">Actions</th>
+              <tr className="bg-[#F4F7FC] border-b border-[#E1EBF5] text-[#5B6E88] font-semibold text-[11px] uppercase tracking-wider">
+                <th className="p-3.5">Quote Ref</th>
+                <th className="p-3.5">Customer &amp; Site</th>
+                <th className="p-3.5">System Sizing</th>
+                <th className="p-3.5 text-right">Gross Total</th>
+                <th className="p-3.5 text-right">Central Subsidy</th>
+                <th className="p-3.5 text-right">Net Payable</th>
+                <th className="p-3.5">Status</th>
+                <th className="p-3.5 text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#E1EBF5]">
               {filteredQuotes.map((quote) => (
-                <tr key={quote.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-3 align-top">
-                    <span className="font-mono font-medium text-slate-900 block">{quote.quoteNumber}</span>
-                    <span className="text-[10px] text-slate-400">
+                <tr key={quote.id} className="hover:bg-[#F4F7FC]/70 transition-colors">
+                  <td className="p-3.5 align-top">
+                    <span className="font-mono font-bold text-[#002E6E] block">{quote.quoteNumber}</span>
+                    <span className="text-[10px] text-[#8C9EB5]">
                       R{quote.revision || 0} &bull; {new Date(quote.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                     </span>
                   </td>
 
-                  <td className="p-3 align-top">
-                    <p className="font-semibold text-slate-900 text-xs">{quote.customerName}</p>
-                    <p className="text-slate-500 text-[11px] font-mono">{quote.customerPhone}</p>
-                    <p className="text-[10px] text-slate-400">{quote.city}</p>
+                  <td className="p-3.5 align-top space-y-0.5">
+                    <p className="font-semibold text-slate-900">{quote.customerName}</p>
+                    <p className="text-[11px] text-[#5B6E88]">{quote.customerPhone}</p>
+                    <p className="text-[11px] text-[#5B6E88] truncate max-w-[200px]">{quote.siteAddress}, {quote.city}</p>
                   </td>
 
-                  <td className="p-3 align-top space-y-0.5">
-                    <span className="font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/80 inline-block text-[11px]">
-                      {quote.systemKw} kW
+                  <td className="p-3.5 align-top space-y-0.5">
+                    <span className="font-semibold text-[#008AC5] bg-[#E8F8FE] px-2 py-0.5 rounded-md border border-[#BCE8FC] inline-block text-[11px]">
+                      {quote.systemKw} kWp
                     </span>
-                    <p className="text-[10px] text-slate-500">
+                    <p className="text-[10px] text-[#5B6E88]">
                       {quote.panelQty}x {quote.panelWattage}Wp Bifacial
                     </p>
                   </td>
 
-                  <td className="p-3 align-top text-right font-medium text-slate-700">
+                  <td className="p-3.5 align-top text-right font-medium text-[#0F1E36]">
                     {formatIndianCurrency(quote.totalGrossPrice)}
                   </td>
 
-                  <td className="p-3 align-top text-right">
-                    <span className="text-emerald-700 font-medium">
+                  <td className="p-3.5 align-top text-right">
+                    <span className="text-[#008A3F] font-semibold">
                       -{formatIndianCurrency(quote.subsidyAmount)}
                     </span>
-                    <span className="block text-[9px] text-emerald-600">PM Surya Ghar</span>
+                    <span className="block text-[9px] text-[#00AC4F]">PM Surya Ghar</span>
                   </td>
 
-                  <td className="p-3 align-top text-right font-semibold text-slate-900 text-sm">
+                  <td className="p-3.5 align-top text-right font-bold text-[#002E6E] text-sm">
                     {formatIndianCurrency(quote.netPayableCustomer)}
                   </td>
 
-                  <td className="p-3 align-top">
+                  <td className="p-3.5 align-top">
                     <span
-                      className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${
+                      className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full capitalize ${
                         quote.status === 'accepted'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          ? 'bg-[#E7F9F0] text-[#008A3F] border border-[#B7ECCF]'
                           : quote.status === 'shared'
-                          ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                          ? 'bg-[#E8F8FE] text-[#008AC5] border border-[#BCE8FC]'
                           : quote.status === 'revised'
                           ? 'bg-purple-50 text-purple-700 border border-purple-200'
                           : 'bg-slate-100 text-slate-700'
@@ -167,120 +176,94 @@ export function QuotationsView({ role, onOpenQuoteModal, onSelectQuoteToView }: 
                     </span>
                   </td>
 
-                  <td className="p-3 align-top text-right">
+                  <td className="p-3.5 align-top text-right">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
-                        onClick={() => onSelectQuoteToView(quote)}
-                        className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white transition-colors"
-                        title="View Official PDF Quotation"
+                        type="button"
+                        onClick={() => {
+                          soundManager.playSoftClick();
+                          onSelectQuoteToView(quote);
+                        }}
+                        className="p-1.5 rounded-xl bg-[#00BAF2] hover:bg-[#00A6DA] text-white transition-all shadow-xs cursor-pointer active:scale-95"
+                        title="View Official Full A4 Proposal"
                       >
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-4 h-4" />
                       </button>
 
                       <button
+                        type="button"
                         onClick={() => {
+                          soundManager.playSoftClick();
                           const url = generateWhatsAppMessage(quote);
                           window.open(url, '_blank');
                         }}
-                        className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 transition-colors"
-                        title="Share Proposal on WhatsApp"
+                        className="p-1.5 rounded-xl bg-[#00AC4F] hover:bg-[#009644] text-white transition-all shadow-xs cursor-pointer active:scale-95"
+                        title="Share on WhatsApp"
                       >
-                        <Share2 className="w-3.5 h-3.5" />
+                        <Share2 className="w-4 h-4" />
                       </button>
-
-                      {role !== 'store_field' && (
-                        <button
-                          onClick={() => {
-                            const reason = prompt('Reason for creating quotation revision:');
-                            if (reason) {
-                              const rev = crmStorage.createQuotationRevision(quote.id, {
-                                notes: `${quote.notes}\n[Revision]: ${reason}`,
-                              });
-                              if (rev) alert(`Created revision ${rev.quoteNumber}`);
-                            }
-                          }}
-                          className="p-1.5 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 transition-colors"
-                          title="Create Revision"
-                        >
-                          <RotateCw className="w-3.5 h-3.5" />
-                        </button>
-                      )}
                     </div>
                   </td>
                 </tr>
               ))}
-
-              {filteredQuotes.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-400">
-                    No quotations match search criteria.
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Mobile Card View (Phone / Field view) */}
+      {/* Mobile Card List */}
       <div className="sm:hidden space-y-3">
         {filteredQuotes.map((quote) => (
-          <div key={quote.id} className="bg-white rounded-xl border border-slate-200 p-3.5 shadow-2xs space-y-2.5">
-            <div className="flex items-start justify-between gap-2">
+          <div key={quote.id} className="bg-white rounded-2xl border border-[#E1EBF5] p-4 shadow-xs space-y-3">
+            <div className="flex items-start justify-between">
               <div>
-                <span className="font-mono text-[10px] text-slate-400">{quote.quoteNumber} (R{quote.revision || 0})</span>
-                <h4 className="font-semibold text-sm text-slate-900 leading-tight">{quote.customerName}</h4>
-                <p className="text-xs text-slate-500 font-mono">{quote.customerPhone} &bull; {quote.city}</p>
+                <span className="font-mono text-xs font-bold text-[#002E6E]">{quote.quoteNumber}</span>
+                <h3 className="font-semibold text-sm text-[#0F1E36]">{quote.customerName}</h3>
+                <p className="text-xs text-[#5B6E88]">{quote.customerPhone} &bull; {quote.city}</p>
               </div>
-              <span
-                className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${
-                  quote.status === 'accepted'
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-slate-100 text-slate-700'
-                }`}
-              >
-                {quote.status}
+              <span className="font-bold text-xs text-[#00BAF2] bg-[#E8F8FE] px-2 py-0.5 rounded-md border border-[#BCE8FC]">
+                {quote.systemKw} kW
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+            <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-[#E1EBF5]">
               <div>
-                <span className="text-[10px] text-slate-400 block">System Size</span>
-                <span className="font-medium text-amber-700">{quote.systemKw} kW Rooftop</span>
+                <span className="text-[10px] text-[#5B6E88] block">Net Payable</span>
+                <span className="font-bold text-sm text-[#002E6E]">{formatIndianCurrency(quote.netPayableCustomer)}</span>
               </div>
-              <div>
-                <span className="text-[10px] text-slate-400 block">Net Payable</span>
-                <span className="font-semibold text-slate-900">{formatIndianCurrency(quote.netPayableCustomer)}</span>
+              <div className="text-right">
+                <span className="text-[10px] text-[#5B6E88] block">Govt Subsidy</span>
+                <span className="font-semibold text-xs text-[#00AC4F]">-{formatIndianCurrency(quote.subsidyAmount)}</span>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E1EBF5]">
               <button
-                onClick={() => onSelectQuoteToView(quote)}
-                className="flex-1 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium flex items-center justify-center gap-1.5"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>View PDF</span>
-              </button>
-              <button
+                type="button"
                 onClick={() => {
+                  soundManager.playSoftClick();
+                  onSelectQuoteToView(quote);
+                }}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-[#00BAF2] text-white text-xs font-semibold cursor-pointer shadow-xs active:scale-95"
+              >
+                <Eye className="w-4 h-4" />
+                <span>View Proposal</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  soundManager.playSoftClick();
                   const url = generateWhatsAppMessage(quote);
                   window.open(url, '_blank');
                 }}
-                className="flex-1 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium flex items-center justify-center gap-1.5"
+                className="inline-flex items-center justify-center p-2 rounded-xl bg-[#00AC4F] text-white cursor-pointer shadow-xs active:scale-95"
               >
-                <Share2 className="w-3.5 h-3.5" />
-                <span>WhatsApp</span>
+                <Share2 className="w-4 h-4" />
               </button>
             </div>
           </div>
         ))}
-
-        {filteredQuotes.length === 0 && (
-          <div className="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400 text-xs">
-            No quotations found.
-          </div>
-        )}
       </div>
     </div>
   );

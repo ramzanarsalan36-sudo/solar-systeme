@@ -1,35 +1,97 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════
-   SYSTOMECH SOLAR CRM — ENTERPRISE CLEAN DESIGN SYSTEM
-   Font: Poppins (Clean, Elegant, Easy to read, Light/Medium weights)
-   Palette: Deep Slate Navy (#0F172A) + Clean Energy Blue (#2563EB) + Warm Amber (#F59E0B)
+   SYSTOMECH SOLAR CRM — PAYTM SIGNATURE DESIGN SYSTEM
+   Iconic Paytm Palette:
+   - Paytm Deep Navy: #002E6E
+   - Paytm Electric Cyan: #00BAF2
+   - Paytm Cyan Soft: #E8F8FE
+   - Paytm Success Green: #00AC4F
+   - Paytm Gold/Amber: #FFA400
+   - Paytm Light Canvas: #F4F7FC
+   - Card Surface: #FFFFFF (Borders: #E1EBF5)
    ═══════════════════════════════════════════════════════════════ */
 
 @layer base {
   :root {
-    --canvas: #F8FAFC;
-    --surface: #FFFFFF;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-tertiary: #94A3B8;
-    --border-subtle: #E2E8F0;
-    --border-medium: #CBD5E1;
+    --paytm-navy: #002E6E;
+    --paytm-cyan: #00BAF2;
+    --paytm-cyan-light: #E8F8FE;
+    --paytm-cyan-hover: #00A6DA;
+    --paytm-green: #00AC4F;
+    --paytm-green-light: #E7F9F0;
+    --paytm-gold: #FFA400;
 
-    --solar-amber: #F59E0B;
-    --solar-amber-dark: #D97706;
-    --solar-emerald: #10B981;
-    --solar-blue: #2563EB;
+    --canvas: #F4F7FC;
+    --surface: #FFFFFF;
+    --text-primary: #0F1E36;
+    --text-secondary: #5B6E88;
+    --text-tertiary: #8C9EB5;
+    --border-subtle: #E1EBF5;
+    --border-medium: #C7D9EC;
   }
 
   body {
-    background-color: var(--canvas);
-    color: var(--text-primary);
+    background-color: #F4F7FC;
+    color: #0F1E36;
     font-family: var(--font-poppins), 'Poppins', var(--font-plus-jakarta-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     letter-spacing: -0.01em;
     font-weight: 400;
   }
+}
+
+/* Paytm Pill & Card Accents */
+.paytm-card {
+  background: #FFFFFF;
+  border: 1px solid #E1EBF5;
+  box-shadow: 0 2px 8px rgba(0, 46, 110, 0.04);
+  border-radius: 1rem;
+}
+
+.paytm-card-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.paytm-card-hover:hover {
+  border-color: #00BAF2;
+  box-shadow: 0 8px 24px rgba(0, 186, 242, 0.12);
+  transform: translateY(-1px);
+}
+
+.paytm-btn-primary {
+  background: #00BAF2;
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
+}
+.paytm-btn-primary:hover {
+  background: #00A6DA;
+  box-shadow: 0 4px 14px rgba(0, 186, 242, 0.35);
+}
+
+.paytm-btn-navy {
+  background: #002E6E;
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: all 0.15s ease;
+}
+.paytm-btn-navy:hover {
+  background: #002354;
+  box-shadow: 0 4px 14px rgba(0, 46, 110, 0.25);
+}
+
+.paytm-badge-cyan {
+  background: #E8F8FE;
+  color: #008AC5;
+  border: 1px solid #BCE8FC;
+}
+
+.paytm-badge-green {
+  background: #E7F9F0;
+  color: #008A3F;
+  border: 1px solid #B7ECCF;
 }
 
 /* Utility to hide scrollbars while keeping scroll functionality */
@@ -50,7 +112,7 @@
 
   html, body {
     background: #ffffff !important;
-    color: #0f172a !important;
+    color: #002e6e !important;
     font-size: 9pt !important;
     line-height: 1.3 !important;
     height: auto !important;
@@ -126,5 +188,5 @@
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #00BAF2;
 }
