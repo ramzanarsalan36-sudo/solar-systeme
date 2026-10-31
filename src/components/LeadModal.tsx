@@ -16,6 +16,7 @@ import {
   Building,
   Sparkles,
   Info,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface LeadModalProps {
@@ -59,6 +60,16 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
       roofType,
     });
   }, [billNumber, connectionType, roofType]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -126,41 +137,49 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
     onClose();
   };
 
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 no-print animate-in fade-in duration-150">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 no-print animate-in fade-in duration-150">
       <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200/90 w-full max-w-2xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden">
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
+        {/* Standardized Modal Header with Back / Return option */}
+        <div className="px-5 py-3.5 border-b border-slate-200/80 flex items-center justify-between shrink-0 bg-slate-50/90">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
-              <UserPlus className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-base font-semibold text-slate-900 tracking-tight">
-                New Solar Lead Intake
-              </h2>
-              <p className="text-xs text-slate-500">
-                Capture rooftop customer details, electricity bill &amp; schedule follow-up
-              </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="Cancel & Return (Esc)"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-600" />
+              <span>Back</span>
+              <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">(Esc)</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center font-medium shrink-0">
+                <UserPlus className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 tracking-tight leading-snug">
+                  New Solar Lead Intake
+                </h2>
+                <p className="text-[11px] text-slate-500 font-normal">
+                  Capture customer details, bill &amp; schedule follow-up
+                </p>
+              </div>
             </div>
           </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
+            title="Close (Esc)"
             aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <span className="hidden sm:inline">Close</span>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -173,18 +192,18 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
               <div className="text-xs">
                 <p className="font-semibold text-amber-900">Duplicate Phone Number Detected</p>
                 <p className="text-amber-800 mt-0.5">
-                  A lead with this number already exists:{' '}
-                  <strong>{duplicateLead.name}</strong> ({duplicateLead.leadNumber}), assigned to {duplicateLead.assignedToName}.
+                  A lead with phone <strong>{duplicateLead.phone}</strong> already exists ({duplicateLead.name} - {duplicateLead.status.toUpperCase()}). Please verify if this is a repeat inquiry.
                 </p>
               </div>
             </div>
           )}
 
-          {/* Section 1: Customer Contact */}
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-              <span>Customer Information</span>
+          {/* Section 1: Customer Identification */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <span>1. Customer &amp; Contact Details</span>
             </h3>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
@@ -192,31 +211,73 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
                 </label>
                 <input
                   type="text"
+                  required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Ramesh Deshmukh"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
-                  required
+                  placeholder="e.g. Ramesh Patil"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Mobile / WhatsApp Number <span className="text-rose-500">*</span>
+                  Phone Number (10-digit Mobile) <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-slate-400 font-medium">
-                    +91
-                  </div>
+                  <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-mono">+91</span>
                   <input
                     type="tel"
+                    required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="98220 54321"
-                    className="w-full pl-11 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 font-mono transition-colors"
-                    required
+                    placeholder="98230 12345"
+                    className="w-full pl-11 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 font-mono transition-colors"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Email Address <span className="text-slate-400 font-normal">(Optional)</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="ramesh@example.com"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Lead Intake Source
+                </label>
+                <select
+                  value={source}
+                  onChange={(e) => setSource(e.target.value as LeadSource)}
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
+                >
+                  <option value="call">Inbound Phone Call</option>
+                  <option value="whatsapp">WhatsApp Inquiry</option>
+                  <option value="website">Website Form Submission</option>
+                  <option value="referral">Existing Customer Referral</option>
+                  <option value="field_visit">Field Canvassing / Door Visit</option>
+                  <option value="exhibition">Solar Expo / Event</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Installation Site Address &amp; Landmarks
+                </label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="e.g. Bungalow 14, Green Valley Society, Baner Road"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
+                />
               </div>
 
               <div>
@@ -225,219 +286,180 @@ export function LeadModal({ isOpen, onClose, onLeadCreated }: LeadModalProps) {
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  placeholder="e.g. Pune, Nashik, Kolhapur"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
+                  placeholder="Pune, Nashik, Kolhapur..."
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Email Address (Optional)</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">PIN Code</label>
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="client@example.com"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
+                  type="text"
+                  maxLength={6}
+                  value={pinCode}
+                  onChange={(e) => setPinCode(e.target.value)}
+                  placeholder="411045"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 font-mono transition-colors"
                 />
               </div>
             </div>
           </div>
 
-          {/* Section 2: Electricity & Rooftop Details */}
-          <div className="pt-2 border-t border-slate-100">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-              <span>Electricity &amp; Sizing Parameters</span>
+          {/* Section 2: Electricity & Solar Sizing */}
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+              <span>2. Electricity Bill &amp; Roof Parameters</span>
+              <span className="text-[11px] text-blue-600 font-medium normal-case flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                Auto-sizes kW &amp; Subsidy
+              </span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
               <div>
                 <label className="block text-xs font-medium text-slate-700 mb-1">
-                  Avg. Monthly Bill (₹)
+                  Average Monthly Bill (₹)
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs text-slate-400 font-medium">
-                    ₹
-                  </div>
+                  <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-medium">₹</span>
                   <input
                     type="number"
-                    value={monthlyBill}
-                    onChange={(e) => setMonthlyBill(e.target.value)}
-                    placeholder="4000"
                     min="500"
                     step="100"
-                    className="w-full pl-7 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 font-mono transition-colors"
+                    value={monthlyBill}
+                    onChange={(e) => setMonthlyBill(e.target.value)}
+                    className="w-full pl-7 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 font-medium transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Power Discom</label>
-                <select
-                  value={discom}
-                  onChange={(e) => setDiscom(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
-                >
-                  <option value="MSEDCL">MSEDCL (Mahavitaran)</option>
-                  <option value="Tata Power">Tata Power (Mumbai)</option>
-                  <option value="Adani Electricity">Adani Electricity</option>
-                  <option value="Torrent Power">Torrent Power</option>
-                  <option value="Other">Other Discom</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Sanctioned Load (kW)</label>
-                <input
-                  type="number"
-                  value={sanctionLoadKw}
-                  onChange={(e) => setSanctionLoadKw(e.target.value)}
-                  placeholder="5"
-                  min="1"
-                  step="0.5"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 font-mono transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Connection Category</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Connection Type
+                </label>
                 <select
                   value={connectionType}
                   onChange={(e) => setConnectionType(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
                 >
-                  <option value="residential">Residential (Surya Ghar Eligible)</option>
-                  <option value="commercial">Commercial / Institutional</option>
-                  <option value="industrial">Industrial</option>
+                  <option value="residential">Residential (Eligible for PM Subsidy)</option>
+                  <option value="commercial">Commercial (C&amp;I)</option>
+                  <option value="industrial">Industrial LT/HT</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Rooftop Structure Type</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Roof Type
+                </label>
                 <select
                   value={roofType}
                   onChange={(e) => setRoofType(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
                 >
-                  <option value="rcc_flat">RCC Concrete Flat Slab</option>
-                  <option value="tin_shed">Tin Industrial Shed</option>
-                  <option value="elevated_required">Elevated Super-Structure (Balcony/Garden)</option>
-                  <option value="tile_roof">Sloped Tiled Roof</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Power Supply Phase</label>
-                <select
-                  value={phase}
-                  onChange={(e) => setPhase(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
-                >
-                  <option value="single">Single Phase (1-Ph 230V)</option>
-                  <option value="three">Three Phase (3-Ph 415V)</option>
+                  <option value="rcc_flat">RCC Flat Roof</option>
+                  <option value="tin_shed">Industrial Tin Shed</option>
+                  <option value="elevated_required">Elevated Superstructure (&gt;8ft)</option>
+                  <option value="tile_roof">Tiled / Sloped Roof</option>
                 </select>
               </div>
             </div>
 
-            {/* Live Instant Sizing Preview Banner */}
+            {/* Live Instant Solar Recommendation Card */}
             {liveEstimate && (
-              <div className="mt-3.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-amber-900">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg bg-amber-500 text-white flex items-center justify-center shrink-0">
-                    <Zap className="w-3.5 h-3.5" />
+              <div className="p-3.5 bg-blue-50/70 border border-blue-200/90 rounded-xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    <span className="text-xs font-semibold text-slate-900">
+                      Recommended System: ~{liveEstimate.recommendedKw} kWp Rooftop Plant
+                    </span>
+                  </div>
+                  {liveEstimate.subsidyEligible && (
+                    <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-300">
+                      PM Surya Ghar Subsidy: {formatIndianCurrency(liveEstimate.subsidyAmount)}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center text-xs pt-1 border-t border-blue-200/60">
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Est. Annual Generation</span>
+                    <span className="font-semibold text-slate-800">
+                      {liveEstimate.annualGenerationUnits.toLocaleString('en-IN')} Units/yr
+                    </span>
                   </div>
                   <div>
-                    <span className="font-semibold text-slate-900">
-                      Recommended System: {liveEstimate.recommendedKw} kW
+                    <span className="text-[11px] text-slate-500 block">Roof Area Needed</span>
+                    <span className="font-semibold text-slate-800">
+                      ~{liveEstimate.roofAreaSqFt} sq. ft.
                     </span>
-                    <span className="text-slate-600 block sm:inline sm:ml-2">
-                      (~{liveEstimate.annualGenerationUnits.toLocaleString('en-IN')} units/yr &bull; {liveEstimate.roofAreaSqFt} sq.ft roof)
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Simple Payback</span>
+                    <span className="font-semibold text-emerald-700">
+                      ~{liveEstimate.paybackPeriodYears} Years
                     </span>
                   </div>
                 </div>
-                {liveEstimate.subsidyEligible && (
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-medium text-[11px] shrink-0 border border-emerald-200">
-                    PM Surya Ghar Subsidy: {formatIndianCurrency(liveEstimate.subsidyAmount)}
-                  </span>
-                )}
               </div>
             )}
           </div>
 
-          {/* Section 3: Source, Follow-up & Notes */}
-          <div className="pt-2 border-t border-slate-100">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-              <span>Pipeline &amp; Follow-Up Schedule</span>
+          {/* Section 3: Pipeline & Follow-up Assignment */}
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              3. Sales Follow-Up Plan
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Inquiry Source</label>
-                <select
-                  value={source}
-                  onChange={(e) => setSource(e.target.value as any)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
-                >
-                  <option value="call">Inbound Phone Call</option>
-                  <option value="whatsapp">WhatsApp Inquiry</option>
-                  <option value="website">Website Lead Form</option>
-                  <option value="referral">Customer Referral</option>
-                  <option value="walk_in">Office Walk-In</option>
-                </select>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Scheduled Next Follow-Up Date
+                </label>
+                <div className="relative">
+                  <Calendar className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+                  <input
+                    type="date"
+                    value={nextFollowUpDate}
+                    onChange={(e) => setNextFollowUpDate(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-amber-600" />
-                  <span>Schedule First Follow-Up Call</span>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Initial Notes / Customer Remarks
                 </label>
-                <input
-                  type="date"
-                  value={nextFollowUpDate}
-                  onChange={(e) => setNextFollowUpDate(e.target.value)}
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 transition-colors"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-slate-700 mb-1">Site Address (Optional)</label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Plot/Flat number, Society, Street, Landmark..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-slate-700 mb-1">Initial Notes</label>
                 <input
                   type="text"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Customer requested quotation on WhatsApp; interested in Tata 550Wp modules"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
+                  placeholder="e.g. Interested in Tata 550Wp modules; wants WhatsApp quote"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-hidden bg-white text-slate-900 placeholder:text-slate-400 transition-colors"
                 />
               </div>
             </div>
           </div>
         </form>
 
-        {/* Modal Footer */}
-        <div className="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2.5 shrink-0">
+        {/* Standardized Modal Footer */}
+        <div className="px-5 py-3.5 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
           >
-            Cancel
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
+            <span>Cancel &amp; Return</span>
           </button>
           <button
             type="submit"
             form="new-lead-form"
-            className="px-5 py-2 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 active:bg-amber-700 rounded-lg shadow-sm transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-xs transition-colors cursor-pointer"
           >
-            Save Lead &amp; Pipeline
+            <span>Save Lead to Pipeline</span>
           </button>
         </div>
       </div>

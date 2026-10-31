@@ -19,6 +19,7 @@ import {
   Plug,
   ShieldCheck,
   Plus,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface TaskModalProps {
@@ -60,9 +61,7 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
       setStatus(task.status);
       setCurrentStage(task.stage || 'survey_done');
       setSiteNotes(task.siteNotes || '');
-      setPhotos(
-        task.proofPhotos && task.proofPhotos.length > 0 ? task.proofPhotos : [DEMO_SOLAR_PHOTOS[0]]
-      );
+      setPhotos(task.proofPhotos && task.proofPhotos.length > 0 ? task.proofPhotos : [DEMO_SOLAR_PHOTOS[0]]);
     }
   }, [task]);
 
@@ -78,31 +77,22 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
 
   if (!isOpen || !task) return null;
 
-  const handleToggleChecklist = (checkId: string) => {
-    crmStorage.toggleTaskChecklist(task.id, checkId);
-    onTaskUpdated();
+  const handleStageSelect = (stageId: Task['stage']) => {
+    setCurrentStage(stageId);
+    if (stageId === 'commissioned') {
+      setStatus('completed');
+    } else {
+      setStatus('in_progress');
+    }
   };
 
-  const handleAddSamplePhoto = () => {
+  const handleAddPhoto = () => {
     const nextPhoto = DEMO_SOLAR_PHOTOS[photos.length % DEMO_SOLAR_PHOTOS.length];
     setPhotos([...photos, nextPhoto]);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setPhotos([...photos, event.target.result as string]);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemovePhoto = (index: number) => {
-    setPhotos(photos.filter((_, i) => i !== index));
+  const handleRemovePhoto = (idx: number) => {
+    setPhotos(photos.filter((_, i) => i !== idx));
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -112,39 +102,59 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
     onClose();
   };
 
-  const completedCount = task.checklist.filter((c) => c.done).length;
-  const progressPercent =
-    task.checklist.length > 0 ? Math.round((completedCount / task.checklist.length) * 100) : 0;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 no-print animate-in fade-in duration-150">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 no-print animate-in fade-in duration-150"
+    >
       <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200/90 w-full max-w-xl max-h-[92vh] sm:max-h-[88vh] flex flex-col overflow-hidden">
-        {/* Modal Header */}
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/70">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
-              <Wrench className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-slate-900 tracking-tight">
-                  {task.taskNumber}
-                </h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-amber-50 text-amber-800 border border-amber-200">
-                  Field Operations
-                </span>
+        {/* Standardized Modal Header with Back / Return Option */}
+        <div className="px-5 py-3.5 border-b border-slate-200/80 flex items-center justify-between shrink-0 bg-slate-50/90">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="Cancel & Return (Esc)"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-600" />
+              <span>Back</span>
+              <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">(Esc)</span>
+            </button>
+
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center font-medium shrink-0">
+                <Wrench className="w-4 h-4" />
               </div>
-              <p className="text-xs text-slate-500 font-normal">
-                Assigned Tech: {task.assignedToName}
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-slate-900 tracking-tight leading-snug">
+                    {task.taskNumber}
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                    Field Operations
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500 font-normal">
+                  Assigned Tech: {task.assignedToName}
+                </p>
+              </div>
             </div>
           </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
+            title="Close (Esc)"
+            aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <span className="hidden sm:inline">Close</span>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -170,132 +180,86 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
                 <MapPin className="w-3.5 h-3.5 text-slate-400" />
                 <span>{task.siteAddress}, {task.city}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-slate-700 font-medium">
-                <Clock className="w-3.5 h-3.5 text-amber-600" />
-                <span>Due: {new Date(task.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
+              <div className="flex items-center gap-1.5 text-amber-700 font-medium">
+                <Clock className="w-3.5 h-3.5" />
+                <span>Target Due: {new Date(task.dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>
               </div>
             </div>
           </div>
 
-          {/* Installation Stage Selector */}
+          {/* Interactive Milestone Stages */}
           <div>
             <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">
-              Installation Stage (Tap to Update)
+              Live Site Installation Stage (Tap to Update)
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {INSTALLATION_STAGES.map((stage) => {
-                const Icon = stage.icon;
-                const isSelected = currentStage === stage.id;
+              {INSTALLATION_STAGES.map((s) => {
+                const Icon = s.icon;
+                const isCurrent = currentStage === s.id;
                 return (
                   <button
-                    key={stage.id}
+                    key={s.id}
                     type="button"
-                    onClick={() => {
-                      setCurrentStage(stage.id);
-                      if (stage.id === 'commissioned') setStatus('completed');
-                      else setStatus('in_progress');
-                    }}
+                    onClick={() => handleStageSelect(s.id)}
                     className={`p-2.5 rounded-xl border text-left flex items-center gap-2 transition-all cursor-pointer ${
-                      isSelected
-                        ? 'border-amber-500 bg-amber-500 text-white shadow-xs font-semibold'
-                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-normal'
+                      isCurrent
+                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                        : 'bg-white border-slate-200 text-slate-700 hover:border-blue-300 hover:bg-blue-50/40'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
-                    <span className="text-xs truncate">{stage.label}</span>
+                    <Icon className={`w-4 h-4 shrink-0 ${isCurrent ? 'text-white' : 'text-blue-600'}`} />
+                    <span className="text-xs font-semibold leading-tight">{s.label}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Photo Proof Section (with Fallback to Prevent Broken Images) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Camera className="w-3.5 h-3.5 text-amber-500" />
-                <span>Site Photos ({photos.length})</span>
+          {/* Site Installation Proof Photos */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                Site Installation Photo Proof ({photos.length})
               </label>
               <button
                 type="button"
-                onClick={handleAddSamplePhoto}
-                className="text-[11px] text-amber-700 hover:text-amber-800 font-medium"
+                onClick={handleAddPhoto}
+                className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
               >
                 + Add Demo Photo
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {photos.map((url, idx) => (
-                <div key={idx} className="relative group rounded-xl overflow-hidden h-24 border border-slate-200 bg-slate-100">
+                <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-4/3">
                   <img
                     src={url}
-                    alt={`Site installation ${idx + 1}`}
+                    alt={`Site proof ${idx + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = DEMO_SOLAR_PHOTOS[0];
+                      (e.target as HTMLImageElement).src = DEMO_SOLAR_PHOTOS[0];
                     }}
                   />
                   <button
                     type="button"
                     onClick={() => handleRemovePhoto(idx)}
-                    className="absolute top-1 right-1 p-1 rounded-md bg-black/60 text-white hover:bg-rose-600 transition-colors opacity-0 group-hover:opacity-100"
+                    className="absolute top-1.5 right-1.5 p-1 rounded-md bg-slate-900/80 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    title="Remove photo"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               ))}
 
-              <label className="h-24 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 bg-slate-50/70 hover:bg-amber-50/30 flex flex-col items-center justify-center cursor-pointer transition-colors text-slate-500 hover:text-amber-700">
-                <Camera className="w-5 h-5 mb-1 text-slate-400" />
-                <span className="text-[10px] font-medium">Upload Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={handleFileUpload}
-                />
-              </label>
-            </div>
-          </div>
-
-          {/* Checklist */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-                Field Verification Checklist
-              </span>
-              <span className="text-[11px] font-medium text-slate-600">
-                {completedCount}/{task.checklist.length} ({progressPercent}%)
-              </span>
-            </div>
-
-            <div className="space-y-1.5">
-              {task.checklist.map((item) => (
-                <div
-                  key={item.id}
-                  onClick={() => handleToggleChecklist(item.id)}
-                  className={`p-2.5 rounded-lg border flex items-center justify-between cursor-pointer transition-colors ${
-                    item.done
-                      ? 'bg-emerald-50/60 border-emerald-200 text-slate-800'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  <span className={`text-xs ${item.done ? 'line-through text-slate-500' : 'font-normal'}`}>
-                    {item.label}
-                  </span>
-                  <div
-                    className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 border ${
-                      item.done
-                        ? 'bg-emerald-600 border-emerald-600 text-white'
-                        : 'border-slate-300 bg-white'
-                    }`}
-                  >
-                    {item.done && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                  </div>
-                </div>
-              ))}
+              <button
+                type="button"
+                onClick={handleAddPhoto}
+                className="border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl flex flex-col items-center justify-center p-3 text-slate-500 hover:text-blue-600 aspect-4/3 transition-colors cursor-pointer"
+              >
+                <Camera className="w-5 h-5 mb-1" />
+                <span className="text-[11px] font-medium">Snap / Upload</span>
+              </button>
             </div>
           </div>
 
@@ -309,27 +273,29 @@ export function TaskModal({ isOpen, onClose, task, onTaskUpdated }: TaskModalPro
               value={siteNotes}
               onChange={(e) => setSiteNotes(e.target.value)}
               placeholder="e.g. Earthing pit resistance 1.4 Ohms. Ready for Discom net-meter inspection."
-              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden bg-white text-slate-800"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden bg-white text-slate-800 transition-colors"
             />
           </div>
-
-          {/* Footer */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-lg transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-xs transition-colors cursor-pointer"
-            >
-              Update Task Status
-            </button>
-          </div>
         </form>
+
+        {/* Standardized Modal Footer */}
+        <div className="px-5 py-3.5 bg-slate-50/90 border-t border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
+            <span>Cancel &amp; Return</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-xs transition-colors cursor-pointer"
+          >
+            <span>Update Task Status</span>
+          </button>
+        </div>
       </div>
     </div>
   );

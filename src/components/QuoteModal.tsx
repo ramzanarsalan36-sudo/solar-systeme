@@ -251,45 +251,51 @@ export function QuoteModal({ isOpen, onClose, initialLead, onQuoteCreated }: Quo
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print"
     >
       <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/90 w-full max-w-4xl overflow-hidden my-6 flex flex-col">
-        {/* Modal Topbar with Clear Back Button */}
-        <div className="px-5 sm:px-6 py-3.5 bg-[#0F172A] text-white flex items-center justify-between shrink-0 border-b border-slate-800">
+        {/* Standardized Modal Header with Back / Return Option */}
+        <div className="px-5 sm:px-6 py-3.5 border-b border-slate-200/80 flex items-center justify-between shrink-0 bg-slate-50/90">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95"
-              title="Return to previous view (or press Esc)"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="Cancel & Return (Esc)"
             >
-              <ArrowLeft className="w-4 h-4 stroke-[2.5] text-amber-400" />
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-600" />
               <span>Back</span>
+              <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">(Esc)</span>
             </button>
 
-            <div className="h-5 w-px bg-slate-700 hidden sm:block" />
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
 
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20 shrink-0">
-                <Calculator className="w-4 h-4 stroke-[2.5]" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center font-medium shrink-0">
+                <Calculator className="w-4 h-4" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-sm sm:text-base font-bold tracking-tight">The 2-Minute Bill-to-Quote Wizard</h2>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-amber-400 text-slate-950">
+                  <h2 className="text-sm font-semibold text-slate-900 tracking-tight leading-snug">
+                    Bill-to-Quote Wizard
+                  </h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700 border border-blue-200">
                     OpenSolar Engine
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 hidden sm:block">
-                  PM Surya Ghar Muft Bijli Yojana &bull; Instant DISCOM Sizing &bull; Equipment Matching
+                <p className="text-[11px] text-slate-500 hidden sm:block">
+                  PM Surya Ghar Sizing &bull; Equipment Selection &bull; 25-Yr ROI
                 </p>
               </div>
             </div>
           </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
             title="Close (Esc)"
+            aria-label="Close"
           >
-            <X className="w-5 h-5" />
+            <span className="hidden sm:inline">Close</span>
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -308,7 +314,7 @@ export function QuoteModal({ isOpen, onClose, initialLead, onQuoteCreated }: Quo
                     onClick={() => setCurrentStep(step.num)}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       isActive
-                        ? 'bg-[#0A1128] text-white shadow-sm'
+                        ? 'bg-blue-600 text-white shadow-xs'
                         : isPast
                         ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
                         : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/60'
@@ -317,7 +323,7 @@ export function QuoteModal({ isOpen, onClose, initialLead, onQuoteCreated }: Quo
                     <span
                       className={`w-5 h-5 rounded-full text-[10px] flex items-center justify-center font-black ${
                         isActive
-                          ? 'bg-amber-400 text-[#0A1128]'
+                          ? 'bg-white text-blue-600'
                           : isPast
                           ? 'bg-emerald-600 text-white'
                           : 'bg-slate-200 text-slate-600'
@@ -824,39 +830,58 @@ export function QuoteModal({ isOpen, onClose, initialLead, onQuoteCreated }: Quo
             </div>
           )}
 
-          {/* Wizard Footer Navigation Controls */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
+          {/* Standardized Wizard Footer Navigation Controls */}
+          <div className="pt-4 border-t border-slate-200/80 flex items-center justify-between gap-3">
             {currentStep > 1 ? (
               <button
                 type="button"
                 onClick={() => setCurrentStep((prev) => prev - 1)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Back</span>
+                <ChevronLeft className="w-4 h-4 text-slate-500" />
+                <span>Previous Step</span>
               </button>
             ) : (
-              <div />
-            )}
-
-            {currentStep < 4 ? (
               <button
                 type="button"
-                onClick={() => setCurrentStep((prev) => prev + 1)}
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold text-white bg-[#0A1128] hover:bg-[#15234A] rounded-xl transition-all shadow-sm cursor-pointer"
+                onClick={onClose}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
               >
-                <span>Continue to Step {currentStep + 1}</span>
-                <ChevronRight className="w-4 h-4 text-amber-400" />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 px-6 py-2.5 text-xs font-bold text-[#0A1128] bg-amber-400 hover:bg-amber-500 rounded-xl transition-all shadow-lg shadow-amber-400/20 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Create Official Branded Proposal</span>
+                <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
+                <span>Cancel &amp; Return</span>
               </button>
             )}
+
+            <div className="flex items-center gap-2">
+              {currentStep > 1 && (
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+              )}
+
+              {currentStep < 4 ? (
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep((prev) => prev + 1)}
+                  className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-xs transition-all cursor-pointer"
+                >
+                  <span>Continue to Step {currentStep + 1}</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-2 px-6 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-xs transition-all cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Create Official Proposal</span>
+                </button>
+              )}
+            </div>
           </div>
         </form>
       </div>

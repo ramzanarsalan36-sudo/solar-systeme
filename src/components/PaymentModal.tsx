@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { crmStorage } from '@/lib/storage';
 import { Order, PaymentRecord } from '@/types/crm';
 import { formatIndianCurrency } from '@/lib/solar-calc';
-import { X, CreditCard, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { X, CreditCard, ArrowLeft } from 'lucide-react';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -66,70 +66,88 @@ export function PaymentModal({ isOpen, onClose, order, onPaymentLogged }: Paymen
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print"
+      className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 no-print animate-in fade-in duration-150"
     >
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200/90 w-full max-w-md overflow-hidden my-6">
-        <div className="px-5 py-3.5 bg-[#0F172A] text-white flex items-center justify-between border-b border-slate-800">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200/90 w-full max-w-md overflow-hidden my-6">
+        {/* Standardized Modal Header with Back / Return Option */}
+        <div className="px-5 py-3.5 border-b border-slate-200/80 flex items-center justify-between shrink-0 bg-slate-50/90">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-all cursor-pointer shadow-xs active:scale-95"
-              title="Return (or press Esc)"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 shadow-2xs transition-all cursor-pointer active:scale-95"
+              title="Cancel & Return (Esc)"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-amber-400" />
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-600" />
               <span>Back</span>
+              <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">(Esc)</span>
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+
+            <div className="h-5 w-px bg-slate-200 hidden sm:block" />
+
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-600 flex items-center justify-center font-medium shrink-0">
                 <CreditCard className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold tracking-tight">Record Milestone Payment</h3>
-                <p className="text-[10px] text-slate-400">Order: {order.orderNumber}</p>
+                <h3 className="text-sm font-semibold text-slate-900 tracking-tight leading-snug">
+                  Record Milestone Payment
+                </h3>
+                <p className="text-[11px] text-slate-500 font-normal">
+                  Order: {order.orderNumber} &bull; {order.customerName}
+                </p>
               </div>
             </div>
           </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-200/70 transition-colors cursor-pointer"
             title="Close (Esc)"
+            aria-label="Close"
           >
+            <span className="hidden sm:inline">Close</span>
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 space-y-3.5 text-xs">
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-            <div className="flex justify-between font-semibold text-slate-900">
-              <span>{order.customerName}</span>
-              <span className="text-amber-800">{order.systemKw} kW System</span>
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between">
+            <div>
+              <span className="text-[10px] text-slate-500 block">Total Order Value</span>
+              <span className="font-semibold text-slate-900">{formatIndianCurrency(order.totalOrderValue)}</span>
             </div>
-            <div className="flex justify-between text-slate-500 text-[11px]">
-              <span>Total Project Value:</span>
-              <span>{formatIndianCurrency(order.totalOrderValue)}</span>
+            <div className="text-right">
+              <span className="text-[10px] text-slate-500 block">Current Balance Due</span>
+              <span className="font-bold text-amber-700">{formatIndianCurrency(order.balanceDue)}</span>
             </div>
-            <div className="flex justify-between text-slate-500 text-[11px]">
-              <span>Already Paid:</span>
-              <span className="text-emerald-700 font-semibold">{formatIndianCurrency(order.totalPaid)}</span>
-            </div>
-            <div className="flex justify-between font-bold text-slate-900 pt-1 border-t border-slate-200 text-xs">
-              <span>Remaining Balance Due:</span>
-              <span className="text-rose-700">{formatIndianCurrency(order.balanceDue)}</span>
-            </div>
+          </div>
+
+          <div>
+            <label className="block font-medium text-slate-700 mb-1">Payment Milestone Stage</label>
+            <select
+              value={stage}
+              onChange={(e) => setStage(e.target.value as any)}
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden bg-white text-slate-800"
+            >
+              <option value="advance_booking">Token Advance (20% Booking)</option>
+              <option value="dispatch_panels">Dispatch Payment (60% Material)</option>
+              <option value="final_commissioning">Commissioning &amp; Net-Metering (20%)</option>
+              <option value="subsidy_disbursed">PM Surya Ghar Subsidy DBT Disbursed</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 mb-1">Payment Amount (₹) *</label>
+              <label className="block font-medium text-slate-700 mb-1">Amount (₹)</label>
               <input
                 type="number"
-                min="1"
+                min="1000"
+                step="500"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden font-bold"
-                required
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden text-slate-900 font-semibold"
               />
             </div>
             <div>
@@ -137,68 +155,53 @@ export function PaymentModal({ isOpen, onClose, order, onPaymentLogged }: Paymen
               <select
                 value={method}
                 onChange={(e) => setMethod(e.target.value as any)}
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden bg-white text-slate-800"
               >
-                <option value="upi">UPI (GPay/PhonePe/Paytm)</option>
-                <option value="neft">NEFT Bank Transfer</option>
-                <option value="rtgs">RTGS</option>
-                <option value="cheque">Cheque</option>
+                <option value="upi">UPI / QR Code</option>
+                <option value="neft">NEFT / RTGS</option>
+                <option value="cheque">Bank Cheque</option>
                 <option value="cash">Cash Receipt</option>
               </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block font-medium text-slate-700 mb-1">Project Milestone Stage</label>
-              <select
-                value={stage}
-                onChange={(e) => setStage(e.target.value as any)}
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
-              >
-                <option value="advance_booking">Token Advance (20%)</option>
-                <option value="material_dispatch">Material Dispatch (60%)</option>
-                <option value="structure_completion">Structure / Mounting</option>
-                <option value="final_commissioning">Commissioning (20%)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block font-medium text-slate-700 mb-1">Txn / UTR / Reference No. *</label>
-              <input
-                type="text"
-                value={referenceNumber}
-                onChange={(e) => setReferenceNumber(e.target.value)}
-                placeholder="e.g. UTR / UPI Ref ID"
-                className="w-full px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
-                required
-              />
-            </div>
-          </div>
-
           <div>
-            <label className="block font-medium text-slate-700 mb-1">Notes / Remarks</label>
+            <label className="block font-medium text-slate-700 mb-1">Transaction Ref / UTR / Cheque No.</label>
             <input
               type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Received in HDFC Current A/c"
-              className="w-full px-3 py-1.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden"
+              value={referenceNumber}
+              onChange={(e) => setReferenceNumber(e.target.value)}
+              placeholder="e.g. UTR-HDFC-982348 or CHQ-002931"
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden text-slate-900"
             />
           </div>
 
-          <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
+          <div>
+            <label className="block font-medium text-slate-700 mb-1">Internal Notes</label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. Received via customer HDFC Bank app. Net-metering application dispatched."
+              className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 focus:outline-hidden text-slate-900 placeholder:text-slate-400"
+            />
+          </div>
+
+          {/* Standardized Modal Footer */}
+          <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1.5 text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg font-medium"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 border border-slate-300 rounded-lg shadow-2xs transition-colors cursor-pointer"
             >
-              Cancel
+              <ArrowLeft className="w-3.5 h-3.5 text-slate-500" />
+              <span>Cancel &amp; Return</span>
             </button>
             <button
               type="submit"
-              className="px-4 py-1.5 font-bold text-[#0F172A] bg-[#F59E0B] hover:bg-[#D97706] rounded-lg shadow-xs"
+              className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 rounded-lg shadow-xs transition-colors cursor-pointer"
             >
-              Issue Payment Receipt
+              <span>Record Receipt</span>
             </button>
           </div>
         </form>
