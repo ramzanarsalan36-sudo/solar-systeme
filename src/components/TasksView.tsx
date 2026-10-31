@@ -14,6 +14,12 @@ import {
   Square,
   AlertTriangle,
   ChevronRight,
+  X,
+  Sun,
+  Layers,
+  Zap,
+  Plug,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface TasksViewProps {
@@ -21,6 +27,15 @@ interface TasksViewProps {
   onSelectTask: (task: Task) => void;
   onRefresh: () => void;
 }
+
+const STAGE_STEPS: { id: NonNullable<Task['stage']>; label: string; num: number }[] = [
+  { id: 'survey_done', label: '1. Survey', num: 1 },
+  { id: 'structure_installed', label: '2. Structure', num: 2 },
+  { id: 'panels_wired', label: '3. Panels', num: 3 },
+  { id: 'inverter_setup', label: '4. Inverter', num: 4 },
+  { id: 'net_meter_applied', label: '5. Net-Meter', num: 5 },
+  { id: 'commissioned', label: '6. Live', num: 6 },
+];
 
 export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -60,34 +75,34 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
 
   const handleCreateTask = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !customerName) {
+    if (!title.trim() || !customerName.trim()) {
       alert('Please fill in Task Title and Customer Name');
       return;
     }
 
     const currentUser = crmStorage.getCurrentUser();
     crmStorage.addTask({
-      title,
-      description,
+      title: title.trim(),
+      description: description.trim(),
       taskType,
       priority,
       status: 'pending',
       assignedTo: 'user-field-1',
       assignedToName: 'Amit Patil',
-      customerName,
-      customerPhone: customerPhone || '+91 98220 00000',
-      siteAddress: siteAddress || 'Site Address TBD',
-      city,
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim() || '+91 98220 00000',
+      siteAddress: siteAddress.trim() || 'Site Address TBD',
+      city: city.trim() || 'Pune',
       dueDate,
       checklist: [
-        { id: `c-1`, label: 'Site physical verification & measurements', done: false },
-        { id: `c-2`, label: 'Mounting & structural integrity check', done: false },
-        { id: `c-3`, label: 'Discom & Net-meter liaison document verification', done: false },
+        { id: `c-1`, label: 'Site structural integrity & roof dimensions verified', done: false },
+        { id: `c-2`, label: 'Mounting brackets & torque specs inspected', done: false },
+        { id: `c-3`, label: 'Earthing resistance checked (< 2.0 Ohms)', done: false },
+        { id: `c-4`, label: 'Discom & Net-meter synchronization completed', done: false },
       ],
       createdBy: currentUser.id,
     });
 
-    alert('New task assigned successfully!');
     setNewTaskModalOpen(false);
     onRefresh();
   };
@@ -101,91 +116,55 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
     onRefresh();
   };
 
-  const handleQuickAddPhoto = (taskId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const task = tasks.find((t) => t.id === taskId);
-    if (!task) return;
-    const samplePhotos = [
-      'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1508873696983-2df5703bc20d?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=800&auto=format&fit=crop&q=80',
-    ];
-    const existing = task.proofPhotos || [];
-    const nextPhoto = samplePhotos[existing.length % samplePhotos.length];
-    crmStorage.updateTaskStatus(taskId, task.status, task.siteNotes, task.stage, [...existing, nextPhoto]);
-    onRefresh();
-  };
-
-  const STAGE_STEPS: { id: NonNullable<Task['stage']>; num: string; label: string }[] = [
-    { id: 'survey_done', num: '1', label: 'Site Survey Done' },
-    { id: 'structure_installed', num: '2', label: 'Structure Mounted' },
-    { id: 'panels_wired', num: '3', label: 'Panels Fixed' },
-    { id: 'inverter_setup', num: '4', label: 'Inverter & Wiring' },
-    { id: 'net_meter_applied', num: '5', label: 'Net-Meter Applied' },
-    { id: 'commissioned', num: '6', label: 'Commissioned' },
-  ];
-
   return (
-    <div className="space-y-6">
-      {/* Header Banner with Real Context Field Photo */}
-      <div className="relative overflow-hidden rounded-3xl bg-[#0B1120] text-white p-6 sm:p-7 border border-slate-800 shadow-xl">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-15"
-          style={{
-            backgroundImage:
-              'url("https://images.unsplash.com/photo-1613665813446-82a78c468a1d?w=800&auto=format&fit=crop&q=80")',
-          }}
-        />
-        <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1 max-w-xl">
-            <div className="flex items-center gap-2">
-              <span className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
-                <Wrench className="w-4 h-4" />
-              </span>
-              <h1 className="text-xl font-bold tracking-tight text-white">
-                Field Operations &amp; Site Work
-              </h1>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase">
-                Plane.so Style
-              </span>
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Optimized for mobile &amp; tablet rooftop crews &bull; 1-tap milestone updates &bull; Real-time photo proof before commissioning
+    <div className="space-y-4 sm:space-y-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-600 flex items-center justify-center font-medium">
+            <Wrench className="w-4 h-4" />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
+              Field Operations &amp; Installation
+            </h1>
+            <p className="text-xs text-slate-500 font-normal">
+              Rooftop solar milestones &bull; Site surveys &bull; DISCOM net-meter inspection checklist
             </p>
           </div>
-
-          <button
-            onClick={() => setNewTaskModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 transition-all cursor-pointer shrink-0"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span>Assign New Field Task</span>
-          </button>
         </div>
+
+        <button
+          onClick={() => setNewTaskModalOpen(true)}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-xs cursor-pointer"
+        >
+          <PlusCircle className="w-4 h-4" />
+          <span>Assign Field Task</span>
+        </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search tasks by title, customer, site city, or #..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-white shadow-2xs"
+            placeholder="Search by title, customer, city..."
+            className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-1.5 p-0.5 bg-slate-100 rounded-lg border border-slate-200/80 overflow-x-auto">
           {['all', 'pending', 'in_progress', 'completed'].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize shrink-0 transition-all ${
+              className={`px-2.5 py-1 rounded-md text-xs font-medium capitalize shrink-0 transition-all cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-[#0B1120] text-amber-400 shadow-xs font-bold'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {st.replace('_', ' ')}
@@ -195,7 +174,7 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
       </div>
 
       {/* Task Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredTasks.map((task) => {
           const doneCount = task.checklist.filter((c) => c.done).length;
           const totalCount = task.checklist.length;
@@ -207,32 +186,32 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
             <div
               key={task.id}
               onClick={() => onSelectTask(task)}
-              className="bg-white rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(0,0,0,0.05)] hover:border-amber-400/50 hover:shadow-lg transition-all duration-200 p-5 space-y-4 cursor-pointer flex flex-col justify-between"
+              className="bg-white rounded-xl border border-slate-200/90 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all p-4 cursor-pointer space-y-3 flex flex-col justify-between"
             >
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {/* Header: ID, Priority, Status */}
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-mono text-[10px] font-bold text-slate-500 uppercase bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200">
+                  <span className="font-mono text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                     {task.taskNumber}
                   </span>
                   <div className="flex items-center gap-1.5">
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${
+                      className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${
                         task.priority === 'urgent'
-                          ? 'bg-rose-100 text-rose-800'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
                           : task.priority === 'high'
-                          ? 'bg-amber-100 text-amber-800'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
                           : 'bg-slate-100 text-slate-700'
                       }`}
                     >
                       {task.priority}
                     </span>
                     <span
-                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full capitalize ${
+                      className={`text-[10px] font-medium px-2 py-0.5 rounded-full capitalize ${
                         task.status === 'completed'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-bold'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium'
                           : task.status === 'in_progress'
-                          ? 'bg-amber-100 text-amber-800'
+                          ? 'bg-amber-50 text-amber-800 border border-amber-200'
                           : 'bg-slate-100 text-slate-700'
                       }`}
                     >
@@ -242,37 +221,35 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900 leading-snug">{task.title}</h3>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{task.description}</p>
+                  <h3 className="font-semibold text-sm text-slate-900 leading-snug">{task.title}</h3>
+                  <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">{task.description}</p>
                 </div>
 
                 {/* Customer Contact & Site Address */}
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1.5 text-xs text-slate-700">
-                  <div className="flex items-center justify-between font-semibold">
-                    <span className="text-slate-900 font-bold">{task.customerName}</span>
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`tel:${task.customerPhone}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-[11px] transition-colors"
-                      >
-                        <Phone className="w-3 h-3" />
-                        <span>Call</span>
-                      </a>
-                    </div>
+                <div className="p-2.5 bg-slate-50/80 rounded-lg border border-slate-100 space-y-1 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-slate-900">{task.customerName}</span>
+                    <a
+                      href={`tel:${task.customerPhone}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-medium"
+                    >
+                      <Phone className="w-3 h-3" />
+                      <span>Call</span>
+                    </a>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-                    <MapPin className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                    <MapPin className="w-3 h-3 shrink-0 text-slate-400" />
                     <span className="truncate">{task.siteAddress}, {task.city}</span>
                   </div>
                 </div>
 
-                {/* ONE-TAP PROGRESS BUTTONS (Plane.so Style Requirement) */}
-                <div className="space-y-1.5 pt-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                    One-Tap Rooftop Progress Stage:
+                {/* Stage Progress Pills */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">
+                    Installation Stage:
                   </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                  <div className="grid grid-cols-3 gap-1">
                     {STAGE_STEPS.map((s) => {
                       const isCurrent = currentStage === s.id;
                       return (
@@ -280,58 +257,36 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
                           key={s.id}
                           type="button"
                           onClick={(e) => handleQuickStageUpdate(task.id, s.id, e)}
-                          className={`px-2 py-1.5 rounded-lg text-[10px] font-semibold text-left transition-all flex items-center gap-1.5 border ${
+                          className={`px-1.5 py-1 rounded-md text-[10px] text-center truncate transition-colors border ${
                             isCurrent
-                              ? 'bg-[#0B1120] text-amber-400 border-[#0B1120] shadow-xs font-bold'
+                              ? 'bg-amber-500 text-white border-amber-500 font-semibold shadow-2xs'
                               : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                           }`}
                         >
-                          <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
-                            isCurrent ? 'bg-amber-400 text-slate-950' : 'bg-slate-100 text-slate-500'
-                          }`}>
-                            {s.num}
-                          </span>
-                          <span className="truncate">{s.label}</span>
+                          {s.label}
                         </button>
                       );
                     })}
                   </div>
                 </div>
-
-                {/* Installation Proof Photo Placeholder */}
-                <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold text-slate-700">Installation Proof:</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                      {photos.length} Photo{photos.length === 1 ? '' : 's'} Uploaded
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => handleQuickAddPhoto(task.id, e)}
-                    className="text-[10px] font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1"
-                  >
-                    + Add Demo Proof
-                  </button>
-                </div>
               </div>
 
               {/* Checklist & Progress */}
-              <div className="pt-3 border-t border-slate-100 space-y-1.5">
+              <div className="pt-2.5 border-t border-slate-100 space-y-1.5">
                 <div className="flex items-center justify-between text-[11px] text-slate-500">
-                  <span>Site Checklist ({doneCount}/{totalCount})</span>
-                  <span className="font-bold text-slate-800">{pct}% Complete</span>
+                  <span>Checklist ({doneCount}/{totalCount})</span>
+                  <span className="font-medium text-slate-700">{pct}%</span>
                 </div>
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-300"
+                    className="h-full bg-amber-500 transition-all duration-300"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
-                  <span>Target Due: {task.dueDate}</span>
-                  <span className="text-amber-700 font-bold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                    View Details &amp; Upload Proof <ChevronRight className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+                  <span>Due: {task.dueDate}</span>
+                  <span className="text-amber-700 font-medium flex items-center gap-0.5">
+                    View &amp; Photos <ChevronRight className="w-3.5 h-3.5" />
                   </span>
                 </div>
               </div>
@@ -340,58 +295,61 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
         })}
 
         {filteredTasks.length === 0 && (
-          <div className="col-span-full p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400">
-            No field tasks found. Click "Assign New Field Task" to create one.
+          <div className="col-span-full p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-500 text-xs">
+            No field tasks match search filters.
           </div>
         )}
       </div>
 
       {/* Assign New Task Modal */}
       {newTaskModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-xs flex items-center justify-center p-3 no-print">
-          <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
-            <div className="px-5 py-3.5 bg-[#10233F] text-white flex items-center justify-between">
-              <h3 className="text-sm font-bold">Assign New Field Task</h3>
-              <button onClick={() => setNewTaskModalOpen(false)} className="text-slate-300 hover:text-white">
-                &times;
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 no-print">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-slate-200 w-full max-w-lg overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-slate-900">Assign Field Task</h3>
+              <button
+                onClick={() => setNewTaskModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateTask} className="p-5 space-y-3 text-xs">
+            <form onSubmit={handleCreateTask} className="p-5 space-y-3.5 text-xs overflow-y-auto">
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Task Title *</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Task Title *</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Structure Erection & Module Alignment"
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Task Type</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Task Type</label>
                   <select
                     value={taskType}
                     onChange={(e) => setTaskType(e.target.value as any)}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden bg-white"
                   >
-                    <option value="site_survey">Site Survey &amp; Measurements</option>
-                    <option value="material_dispatch">Material Dispatch / Delivery</option>
+                    <option value="site_survey">Site Survey &amp; Roof Check</option>
+                    <option value="material_dispatch">Material Dispatch</option>
                     <option value="structure_installation">Structure Grouting &amp; Erection</option>
-                    <option value="panel_mounting">Panel Clamping &amp; Alignment</option>
-                    <option value="wiring_inverter_setup">Inverter &amp; ACDB/DCDB Wiring</option>
-                    <option value="net_meter_inspection">Net Metering Testing &amp; Commissioning</option>
+                    <option value="panel_mounting">Panel Mounting &amp; Clamping</option>
+                    <option value="wiring_inverter_setup">Inverter &amp; ACDB Wiring</option>
+                    <option value="net_meter_inspection">Net Metering Commissioning</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Priority</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Priority</label>
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value as any)}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden bg-white"
                   >
                     <option value="urgent">Urgent</option>
                     <option value="high">High</option>
@@ -403,74 +361,74 @@ export function TasksView({ role, onSelectTask, onRefresh }: TasksViewProps) {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Customer Name *</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Customer Name *</label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Customer Name"
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Phone</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Phone</label>
                   <input
                     type="text"
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="+91 98220 12345"
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">City</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">City</label>
                   <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                   />
                 </div>
                 <div>
-                  <label className="block font-medium text-slate-700 mb-1">Target Due Date</label>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Target Due Date</label>
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-medium text-slate-700 mb-1">Site Address &amp; Description</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Site Instructions</label>
                 <textarea
                   rows={2}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Task instructions and site requirements..."
-                  className="w-full px-3 py-1.5 rounded-lg border border-slate-300"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-200 focus:border-amber-500 focus:outline-hidden"
                 />
               </div>
 
-              <div className="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setNewTaskModalOpen(false)}
-                  className="px-3 py-1.5 text-slate-600 bg-white border border-slate-300 rounded-lg"
+                  className="px-3.5 py-1.5 text-xs font-medium text-slate-600 bg-white border border-slate-200 rounded-lg"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-1.5 font-bold text-[#10233F] bg-[#F4B740] hover:bg-[#D99B26] rounded-lg"
+                  className="px-4 py-1.5 text-xs font-semibold text-white bg-amber-500 hover:bg-amber-600 rounded-lg shadow-xs"
                 >
-                  Create &amp; Assign Task
+                  Create Task
                 </button>
               </div>
             </form>

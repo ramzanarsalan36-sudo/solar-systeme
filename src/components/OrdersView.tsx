@@ -9,10 +9,7 @@ import {
   Search,
   CreditCard,
   CheckCircle2,
-  Clock,
   Wrench,
-  AlertCircle,
-  FileText,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -50,40 +47,41 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
   const handleUpdateStatus = (order: Order, newStatus: OrderStatus) => {
     const notes = prompt(`Optional field progress note for advancing to ${newStatus.replace('_', ' ')}:`);
     crmStorage.updateOrderStatus(order.id, newStatus, notes || undefined);
-    alert(`Order ${order.orderNumber} updated to ${newStatus}`);
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 sm:space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-        <div>
-          <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            <PackageCheck className="w-5 h-5 text-emerald-600" />
-            <span>Orders &amp; Payment Collections</span>
-          </h1>
-          <p className="text-xs text-slate-500">
-            Installation milestone tracking &bull; Milestone payments (Advance, Dispatch, Commissioning) &bull; Field handover
-          </p>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 flex items-center justify-center font-medium">
+            <PackageCheck className="w-4 h-4" />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">
+              Orders &amp; Payment Collections
+            </h1>
+            <p className="text-xs text-slate-500 font-normal">
+              Turnkey solar projects &bull; Milestone stages &bull; Advance, dispatch &amp; commissioning payments
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Search */}
-      <div className="max-w-md">
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search orders by customer, Order #, or Quote #..."
-            className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-hidden bg-white"
-          />
-        </div>
+      <div className="relative max-w-sm">
+        <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5 pointer-events-none" />
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search by customer, Order #, or Quote #..."
+          className="w-full pl-9 pr-3 py-1.5 text-xs sm:text-sm rounded-lg border border-slate-200 bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/15 focus:outline-hidden text-slate-800 placeholder:text-slate-400 transition-colors"
+        />
       </div>
 
       {/* Orders List Cards */}
-      <div className="space-y-4">
+      <div className="space-y-3.5">
         {filteredOrders.map((order) => {
           const isExpanded = expandedOrderId === order.id;
           const currentStageIndex = ORDER_STAGES.findIndex((s) => s.id === order.status);
@@ -92,45 +90,45 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
           return (
             <div
               key={order.id}
-              className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden transition-all"
+              className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden transition-all"
             >
               <div className="p-4 sm:p-5 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-xs bg-slate-100 text-slate-800 px-2.5 py-0.5 rounded-full">
+                    <span className="font-mono text-xs font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
                       {order.orderNumber}
                     </span>
-                    <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                      {order.systemKw} kW Rooftop System
+                    <span className="text-xs font-medium text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/80">
+                      {order.systemKw} kW System
                     </span>
-                    <span className="text-xs text-slate-400">Ref: {order.quoteNumber}</span>
+                    <span className="text-xs text-slate-400">Quote: {order.quoteNumber}</span>
                   </div>
 
-                  <h3 className="font-bold text-sm text-slate-900">{order.customerName}</h3>
+                  <h3 className="font-semibold text-sm sm:text-base text-slate-900 leading-snug">{order.customerName}</h3>
                   <p className="text-xs text-slate-500">
-                    {order.siteAddress} &bull; Phone: {order.customerPhone}
+                    {order.siteAddress} &bull; {order.customerPhone}
                   </p>
                   {order.assignedFieldEngineerName && (
                     <p className="text-[11px] text-emerald-800 flex items-center gap-1">
                       <Wrench className="w-3 h-3 text-emerald-600" />
-                      Field Lead: <strong>{order.assignedFieldEngineerName}</strong>
+                      <span>Field Engineer: <strong>{order.assignedFieldEngineerName}</strong></span>
                     </p>
                   )}
                 </div>
 
-                {/* Financial Summary Pill */}
-                <div className="flex flex-wrap items-center gap-4 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+                {/* Financial Summary */}
+                <div className="flex flex-wrap items-center gap-3 text-xs bg-slate-50/80 p-2.5 sm:p-3 rounded-lg border border-slate-200/80 w-full lg:w-auto justify-between lg:justify-start">
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Total Value</span>
-                    <span className="font-bold text-slate-900">{formatIndianCurrency(order.totalOrderValue)}</span>
+                    <span className="text-[10px] text-slate-400 block">Total Value</span>
+                    <span className="font-semibold text-slate-900">{formatIndianCurrency(order.totalOrderValue)}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Paid ({paymentProgress}%)</span>
-                    <span className="font-bold text-emerald-700">{formatIndianCurrency(order.totalPaid)}</span>
+                    <span className="text-[10px] text-slate-400 block">Paid ({paymentProgress}%)</span>
+                    <span className="font-semibold text-emerald-700">{formatIndianCurrency(order.totalPaid)}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-500 block">Balance Due</span>
-                    <span className={`font-bold ${order.balanceDue > 0 ? 'text-rose-700' : 'text-slate-400'}`}>
+                    <span className="text-[10px] text-slate-400 block">Balance</span>
+                    <span className={`font-semibold ${order.balanceDue > 0 ? 'text-rose-600' : 'text-slate-400'}`}>
                       {formatIndianCurrency(order.balanceDue)}
                     </span>
                   </div>
@@ -138,7 +136,7 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
                   {role !== 'store_field' && (
                     <button
                       onClick={() => onOpenPaymentModal(order)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-[#10233F] text-[#F4B740] hover:bg-[#1b355d] transition-colors shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white transition-colors shadow-2xs cursor-pointer ml-auto sm:ml-0"
                     >
                       <CreditCard className="w-3.5 h-3.5" />
                       <span>Record Payment</span>
@@ -147,37 +145,35 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
                 </div>
               </div>
 
-              {/* Status Milestone Progress Bar */}
+              {/* Status Milestone Bar */}
               <div className="px-4 sm:px-5 pb-3">
                 <div className="flex items-center justify-between text-[11px] font-medium text-slate-700 mb-2">
-                  <span className="flex items-center gap-1.5 font-bold text-slate-900">
+                  <span className="flex items-center gap-1.5 font-semibold text-slate-900">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    Current Status: <span className="capitalize">{order.status.replace('_', ' ')}</span>
+                    <span>Status: <span className="capitalize">{order.status.replace('_', ' ')}</span></span>
                   </span>
 
-                  {/* Advance status selector for field/admin */}
                   <select
                     value={order.status}
                     onChange={(e) => handleUpdateStatus(order, e.target.value as OrderStatus)}
-                    className="text-xs px-2.5 py-1 rounded-lg border border-slate-300 bg-white font-medium focus:ring-2 focus:ring-amber-500"
+                    className="text-xs px-2.5 py-1 rounded-lg border border-slate-200 bg-white font-medium focus:border-amber-500 focus:outline-hidden"
                   >
                     {ORDER_STAGES.map((st) => (
                       <option key={st.id} value={st.id}>
-                        Update to: {st.label}
+                        {st.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                {/* Progress bar visual */}
                 <div className="grid grid-cols-7 gap-1">
                   {ORDER_STAGES.map((st, idx) => {
                     const isDone = idx <= currentStageIndex;
                     return (
                       <div
                         key={st.id}
-                        className={`h-2 rounded-full transition-colors ${
-                          isDone ? 'bg-emerald-500' : 'bg-slate-200'
+                        className={`h-1.5 rounded-full transition-colors ${
+                          isDone ? 'bg-amber-500' : 'bg-slate-100'
                         }`}
                         title={st.label}
                       />
@@ -186,18 +182,18 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
                 </div>
               </div>
 
-              {/* Expand Toggle for Payment History & Notes */}
-              <div className="px-4 sm:px-5 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+              {/* Expand Toggle */}
+              <div className="px-4 sm:px-5 py-2 bg-slate-50/70 border-t border-slate-100 flex items-center justify-between text-xs">
                 <button
                   onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                  className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1"
+                  className="text-slate-600 hover:text-slate-900 font-medium flex items-center gap-1 cursor-pointer"
                 >
-                  <span>{order.payments.length} Payment Receipts &bull; Field Notes</span>
+                  <span>{order.payments.length} Payments &bull; Notes</span>
                   {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                 </button>
 
                 <span className="text-[11px] text-slate-400">
-                  Target Commissioning: {order.expectedCommissioningDate || 'Pending final net-meter test'}
+                  Commissioning: {order.expectedCommissioningDate || 'Pending net-meter sync'}
                 </span>
               </div>
 
@@ -205,31 +201,31 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
               {isExpanded && (
                 <div className="p-4 sm:p-5 bg-slate-50/50 border-t border-slate-200 space-y-3 text-xs">
                   <div>
-                    <h4 className="font-bold text-slate-800 text-[11px] uppercase tracking-wider mb-2">
-                      Logged Milestone Payment Receipts
+                    <h4 className="font-semibold text-slate-800 text-[11px] uppercase tracking-wider mb-2">
+                      Payment Receipts
                     </h4>
                     {order.payments.length > 0 ? (
                       <div className="overflow-x-auto">
                         <table className="w-full text-left bg-white rounded-lg border border-slate-200 text-xs">
                           <thead>
-                            <tr className="bg-slate-100 text-slate-600">
+                            <tr className="bg-slate-50 text-slate-500 text-[11px] uppercase">
                               <th className="p-2">Receipt #</th>
                               <th className="p-2">Date</th>
-                              <th className="p-2">Milestone Stage</th>
+                              <th className="p-2">Stage</th>
                               <th className="p-2">Mode</th>
-                              <th className="p-2">Txn / UTR Ref</th>
+                              <th className="p-2">UTR Ref</th>
                               <th className="p-2 text-right">Amount (₹)</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100">
                             {order.payments.map((p) => (
                               <tr key={p.id}>
-                                <td className="p-2 font-mono font-bold">{p.receiptNumber}</td>
-                                <td className="p-2">{new Date(p.date).toLocaleDateString('en-IN')}</td>
-                                <td className="p-2 capitalize">{p.stage.replace('_', ' ')}</td>
-                                <td className="p-2 font-semibold uppercase">{p.method}</td>
-                                <td className="p-2 font-mono text-[11px] text-slate-600">{p.referenceNumber}</td>
-                                <td className="p-2 text-right font-bold text-emerald-700">
+                                <td className="p-2 font-mono font-medium text-slate-800">{p.receiptNumber}</td>
+                                <td className="p-2 text-slate-500">{new Date(p.date).toLocaleDateString('en-IN')}</td>
+                                <td className="p-2 capitalize text-slate-700">{p.stage.replace('_', ' ')}</td>
+                                <td className="p-2 font-medium uppercase text-slate-700">{p.method}</td>
+                                <td className="p-2 font-mono text-[11px] text-slate-500">{p.referenceNumber}</td>
+                                <td className="p-2 text-right font-semibold text-emerald-700">
                                   {formatIndianCurrency(p.amount)}
                                 </td>
                               </tr>
@@ -238,16 +234,16 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
                         </table>
                       </div>
                     ) : (
-                      <p className="text-slate-500 italic">No payments logged yet for this order.</p>
+                      <p className="text-slate-400 italic">No payments logged yet for this order.</p>
                     )}
                   </div>
 
                   {order.notes && (
-                    <div className="pt-2">
-                      <span className="font-bold text-slate-800 text-[11px] uppercase tracking-wider block mb-1">
-                        Operational &amp; Field Notes
+                    <div className="pt-1">
+                      <span className="font-semibold text-slate-700 text-[11px] uppercase tracking-wider block mb-1">
+                        Field Notes
                       </span>
-                      <pre className="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-700 whitespace-pre-wrap font-sans">
+                      <pre className="p-2.5 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 whitespace-pre-wrap font-sans">
                         {order.notes}
                       </pre>
                     </div>
@@ -259,8 +255,8 @@ export function OrdersView({ role, onOpenPaymentModal }: OrdersViewProps) {
         })}
 
         {filteredOrders.length === 0 && (
-          <div className="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400">
-            No orders found matching search criteria.
+          <div className="p-8 text-center bg-white rounded-xl border border-slate-200 text-slate-400 text-xs">
+            No orders match search criteria.
           </div>
         )}
       </div>

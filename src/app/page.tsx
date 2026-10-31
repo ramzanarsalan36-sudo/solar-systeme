@@ -5,6 +5,7 @@ import { User, Lead, Product, Order, Task, Quotation } from '@/types/crm';
 import { crmStorage } from '@/lib/storage';
 import { Navbar } from '@/components/Navbar';
 import { Sidebar } from '@/components/Sidebar';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { DashboardView } from '@/components/DashboardView';
 import { LeadsView } from '@/components/LeadsView';
 import { QuotationsView } from '@/components/QuotationsView';
@@ -134,7 +135,7 @@ export default function SolarCrmApp() {
         />
 
         {/* Main Operational View Content Area */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full transition-all">
+        <main className="flex-1 min-w-0 p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full pb-20 md:pb-8 transition-all">
           {activeTab === 'dashboard' && (
             <DashboardView
               role={currentUser.role}
@@ -217,6 +218,17 @@ export default function SolarCrmApp() {
           {activeTab === 'audit' && <AuditView role={currentUser.role} />}
         </main>
       </div>
+
+      {/* Field Tech & Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        role={currentUser.role}
+        onOpenQuoteModal={() => {
+          setInitialLeadForQuote(null);
+          setQuoteModalOpen(true);
+        }}
+      />
 
       {/* Global Interactive Modals */}
       <LeadModal
